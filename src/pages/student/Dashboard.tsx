@@ -3,28 +3,25 @@ import { Link } from 'react-router-dom';
 import { 
   User, 
   BookOpen, 
-  FileText, 
-  Bell, 
   Settings, 
   LogOut,
   Calendar,
   GraduationCap,
-  ClipboardList,
-  CreditCard,
-  Download
+  CreditCard
 } from 'lucide-react';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
+import { StudentStatsGrid } from '@/components/student/StudentStatsGrid';
+import { CourseRegistration } from '@/components/student/CourseRegistration';
+import { ResultsView } from '@/components/student/ResultsView';
+import { FeePaymentTracking } from '@/components/student/FeePaymentTracking';
 
 const mockCourses = [
-  { code: 'CSE-101', name: 'Introduction to Computer Science', credits: 3, grade: 'A', status: 'completed' },
-  { code: 'CSE-201', name: 'Data Structures', credits: 3, grade: 'A-', status: 'completed' },
   { code: 'CSE-301', name: 'Database Systems', credits: 3, grade: null, status: 'ongoing' },
   { code: 'CSE-305', name: 'Software Engineering', credits: 3, grade: null, status: 'ongoing' },
-  { code: 'MATH-201', name: 'Discrete Mathematics', credits: 3, grade: 'B+', status: 'completed' },
 ];
 
 const mockNotices = [
@@ -40,7 +37,7 @@ const StudentDashboard = () => {
     { label: 'Current CGPA', value: '3.65', icon: GraduationCap, color: 'bg-blue-500' },
     { label: 'Credits Completed', value: '45', icon: BookOpen, color: 'bg-green-500' },
     { label: 'Current Semester', value: '4th', icon: Calendar, color: 'bg-orange-500' },
-    { label: 'Pending Dues', value: '৳0', icon: CreditCard, color: 'bg-purple-500' },
+    { label: 'Pending Dues', value: '৳57,700', icon: CreditCard, color: 'bg-purple-500' },
   ];
 
   return (
@@ -68,30 +65,15 @@ const StudentDashboard = () => {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {stats.map((stat, idx) => (
-              <Card key={idx}>
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 ${stat.color} rounded-lg flex items-center justify-center`}>
-                      <stat.icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold">{stat.value}</p>
-                      <p className="text-sm text-muted-foreground">{stat.label}</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <StudentStatsGrid stats={stats} />
 
           {/* Main Content */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-6">
+            <TabsList className="mb-6 flex-wrap h-auto">
               <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="courses">Courses</TabsTrigger>
+              <TabsTrigger value="registration">Course Registration</TabsTrigger>
               <TabsTrigger value="results">Results</TabsTrigger>
+              <TabsTrigger value="fees">Fee Payment</TabsTrigger>
               <TabsTrigger value="profile">Profile</TabsTrigger>
             </TabsList>
 
@@ -104,7 +86,7 @@ const StudentDashboard = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {mockCourses.filter(c => c.status === 'ongoing').map((course) => (
+                      {mockCourses.map((course) => (
                         <div key={course.code} className="border rounded-lg p-4">
                           <div className="flex justify-between items-start mb-2">
                             <div>
@@ -181,69 +163,16 @@ const StudentDashboard = () => {
               </div>
             </TabsContent>
 
-            <TabsContent value="courses">
-              <Card>
-                <CardHeader>
-                  <CardTitle>All Courses</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-3 px-4 font-medium">Code</th>
-                          <th className="text-left py-3 px-4 font-medium">Course Name</th>
-                          <th className="text-center py-3 px-4 font-medium">Credits</th>
-                          <th className="text-center py-3 px-4 font-medium">Grade</th>
-                          <th className="text-center py-3 px-4 font-medium">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {mockCourses.map((course) => (
-                          <tr key={course.code} className="border-b hover:bg-muted/50">
-                            <td className="py-3 px-4 font-medium">{course.code}</td>
-                            <td className="py-3 px-4">{course.name}</td>
-                            <td className="py-3 px-4 text-center">{course.credits}</td>
-                            <td className="py-3 px-4 text-center">
-                              {course.grade || '-'}
-                            </td>
-                            <td className="py-3 px-4 text-center">
-                              <span className={`px-2 py-0.5 rounded-full text-xs ${
-                                course.status === 'completed' 
-                                  ? 'bg-green-100 text-green-700' 
-                                  : 'bg-blue-100 text-blue-700'
-                              }`}>
-                                {course.status}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
+            <TabsContent value="registration">
+              <CourseRegistration />
             </TabsContent>
 
             <TabsContent value="results">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
-                  <CardTitle>Academic Results</CardTitle>
-                  <Button variant="outline" size="sm">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Transcript
-                  </Button>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8">
-                    <GraduationCap className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Results will be displayed here</h3>
-                    <p className="text-muted-foreground">
-                      Your semester-wise results and CGPA progression will appear here.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+              <ResultsView />
+            </TabsContent>
+
+            <TabsContent value="fees">
+              <FeePaymentTracking />
             </TabsContent>
 
             <TabsContent value="profile">
