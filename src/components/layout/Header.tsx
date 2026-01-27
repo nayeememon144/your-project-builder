@@ -16,39 +16,13 @@ import {
 } from 'lucide-react';
 import sstuLogo from '@/assets/sstu-logo.png';
 import { cn } from '@/lib/utils';
+import { AcademicMegaMenu } from './AcademicMegaMenu';
 
 const topBarLinks = [
   { icon: Phone, text: '+880-831-52012', href: 'tel:+880831-52012' },
   { icon: Mail, text: 'info@sstu.ac.bd', href: 'mailto:info@sstu.ac.bd' },
   { icon: MapPin, text: 'Shantiganj 3000, Sunamganj, Bangladesh', href: '#contact' },
 ];
-
-const academicMegaMenuData = {
-  academicInfo: {
-    title: 'Academic Information',
-    items: [
-      { label: 'Academic Calendars', href: '/academic/calendar' },
-      { label: 'Undergraduate Program', href: '/academic/undergraduate' },
-      { label: 'International Students', href: '/academic/international' },
-    ]
-  },
-  faculties: {
-    title: 'Faculties',
-    items: [
-      { label: 'Faculty of Science', href: '/faculties/science' },
-      { label: 'Faculty of Engineering & Technology', href: '/faculties/engineering' },
-    ]
-  },
-  departments: {
-    title: 'Departments',
-    items: [
-      { label: 'Computer Science & Engineering', href: '/departments/cse' },
-      { label: 'Physics', href: '/departments/physics' },
-      { label: 'Chemistry', href: '/departments/chemistry' },
-      { label: 'Mathematics', href: '/departments/math' },
-    ]
-  }
-};
 
 const facilitiesDropdown = [
   { label: 'DSW', href: '/facilities/dsw' },
@@ -296,69 +270,7 @@ export const Header = () => {
               onMouseEnter={() => setActiveDropdown('Academics')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <div className="container mx-auto py-3 px-4">
-                <div className="grid grid-cols-3 gap-4 max-w-3xl">
-                  {/* Academic Information */}
-                  <div>
-                    <h3 className="font-formal font-semibold text-primary text-xs uppercase tracking-wide border-b border-gold pb-1 mb-1.5">
-                      {academicMegaMenuData.academicInfo.title}
-                    </h3>
-                    <ul>
-                      {academicMegaMenuData.academicInfo.items.map((item, idx) => (
-                        <li key={idx}>
-                          <Link
-                            to={item.href}
-                            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
-                          >
-                            <ChevronRight className="w-3 h-3 text-gray-400" />
-                            {item.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Faculties */}
-                  <div>
-                    <h3 className="font-formal font-semibold text-primary text-xs uppercase tracking-wide border-b border-gold pb-1 mb-1.5">
-                      {academicMegaMenuData.faculties.title}
-                    </h3>
-                    <ul>
-                      {academicMegaMenuData.faculties.items.map((item, idx) => (
-                        <li key={idx}>
-                          <Link
-                            to={item.href}
-                            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
-                          >
-                            <ChevronRight className="w-3 h-3 text-gray-400" />
-                            {item.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Departments */}
-                  <div>
-                    <h3 className="font-formal font-semibold text-primary text-xs uppercase tracking-wide border-b border-gold pb-1 mb-1.5">
-                      {academicMegaMenuData.departments.title}
-                    </h3>
-                    <ul>
-                      {academicMegaMenuData.departments.items.map((item, idx) => (
-                        <li key={idx}>
-                          <Link
-                            to={item.href}
-                            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
-                          >
-                            <ChevronRight className="w-3 h-3 text-gray-400" />
-                            {item.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
+              <AcademicMegaMenu />
             </motion.div>
           )}
         </AnimatePresence>
