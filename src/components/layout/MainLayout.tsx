@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { BackToTopButton } from '@/components/ui/BackToTopButton';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -14,6 +15,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
         {children}
       </main>
       <Footer />
+      <BackToTopButton />
     </div>
   );
 };

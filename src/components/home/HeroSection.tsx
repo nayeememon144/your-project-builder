@@ -41,7 +41,7 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative h-[80vh] min-h-[600px] overflow-hidden">
+    <section className="relative h-screen min-h-[700px] overflow-hidden">
       {/* Background Slides - Crossfade without white flash */}
       {slides.map((slide, index) => (
         <div
