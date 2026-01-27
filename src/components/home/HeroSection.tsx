@@ -1,30 +1,47 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import campus1 from '@/assets/campus/campus-1.jpg';
 import campus2 from '@/assets/campus/campus-2.jpg';
 import campus3 from '@/assets/campus/campus-3.jpg';
 
-const defaultSlides = [
-  {
-    id: '1',
-    image_url: campus1,
-  },
-  {
-    id: '2',
-    image_url: campus2,
-  },
-  {
-    id: '3',
-    image_url: campus3,
-  },
+interface HeroSlide {
+  id: string;
+  image_url: string;
+  title?: string;
+  subtitle?: string;
+}
+
+const defaultSlides: HeroSlide[] = [
+  { id: '1', image_url: campus1 },
+  { id: '2', image_url: campus2 },
+  { id: '3', image_url: campus3 },
 ];
 
 export const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [slides] = useState(defaultSlides);
+
+  // Fetch hero slides from database
+  const { data: dbSlides } = useQuery({
+    queryKey: ['hero-slides'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('hero_slides')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      if (error) throw error;
+      return data as HeroSlide[];
+    },
+  });
+
+  // Use database slides if available, otherwise use defaults
+  const slides = dbSlides && dbSlides.length > 0 ? dbSlides : defaultSlides;
 
   useEffect(() => {
+    if (slides.length === 0) return;
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 6000);
