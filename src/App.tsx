@@ -15,6 +15,7 @@ import AdminHeroSlides from "./pages/admin/HeroSlidesManagement";
 import AdminNoticeCategories from "./pages/admin/NoticeCategoriesManagement";
 import AdminGallery from "./pages/admin/GalleryManagement";
 import AdminTeachers from "./pages/admin/TeachersManagement";
+import AdminEvents from "./pages/admin/EventsManagement";
 import TeacherLogin from "./pages/teacher/Login";
 import TeacherRegister from "./pages/teacher/Register";
 import TeacherDashboard from "./pages/teacher/Dashboard";
@@ -139,6 +140,14 @@ const App = () => (
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminTeachers />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/events" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminEvents />
               </ProtectedRoute>
             } 
           />

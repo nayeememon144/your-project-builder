@@ -173,7 +173,7 @@ export const Footer = () => {
               {/* Map - SSTU Location */}
               <div className="bg-primary-foreground/10 rounded-lg overflow-hidden h-48">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d57897.94282752866!2d91.35!3d24.87!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x375158e5c7376bcb%3A0x3c2e8a31e5a2e2fa!2sSunamganj!5e0!3m2!1sen!2sbd!4v1706370000000!5m2!1sen!2sbd"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3619.1234567890123!2d91.39892961500789!3d24.86621398404831!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x375058ba92ad11f1%3A0xba7d98d1e1b1b1b1!2sSunamganj%20Science%20and%20Technology%20University!5e0!3m2!1sen!2sbd!4v1706370000000!5m2!1sen!2sbd"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
