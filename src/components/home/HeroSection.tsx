@@ -72,7 +72,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative bg-white/10 backdrop-blur-lg rounded-2xl px-8 py-10 md:px-16 md:py-14 border border-white/20 shadow-2xl max-w-5xl mx-4 overflow-hidden"
+            className="relative bg-white/10 backdrop-blur-lg rounded-2xl px-8 py-10 md:px-16 md:py-14 border border-white/20 shadow-[0_0_60px_rgba(255,255,255,0.15),0_0_100px_rgba(34,139,87,0.2)] max-w-5xl mx-4 overflow-hidden"
           >
             {/* Green accent line at bottom */}
             <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary to-accent" />
@@ -116,7 +116,7 @@ export const HeroSection = () => {
       </button>
 
       {/* Slide Indicators */}
-      <div className="absolute z-20 bottom-20 left-1/2 -translate-x-1/2 flex gap-3">
+      <div className="absolute z-20 bottom-24 left-1/2 -translate-x-1/2 flex gap-3">
         {slides.map((_, idx) => (
           <button
             key={idx}
@@ -134,18 +134,18 @@ export const HeroSection = () => {
       {/* Scroll Down Indicator */}
       <motion.button
         onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-        className="absolute z-20 bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors cursor-pointer"
+        className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/90 hover:text-white transition-colors cursor-pointer"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1, duration: 0.5 }}
         aria-label="Scroll down"
       >
-        <span className="text-xs uppercase tracking-widest">Scroll</span>
+        <span className="text-sm font-medium uppercase tracking-widest">Scroll</span>
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
         >
-          <ChevronDown className="w-6 h-6" />
+          <ChevronDown className="w-7 h-7" />
         </motion.div>
       </motion.button>
     </section>
