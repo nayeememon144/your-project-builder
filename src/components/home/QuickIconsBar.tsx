@@ -18,7 +18,7 @@ const quickIcons = [
 
 export const QuickIconsBar = () => {
   return (
-    <section className="bg-white py-6 shadow-md relative z-10">
+    <section className="bg-white py-4 shadow-md relative z-10">
       <div className="container mx-auto">
         <div className="flex justify-center gap-8 md:gap-16">
           {quickIcons.map((item, idx) => (
