@@ -13,6 +13,8 @@ import AdminFaculties from "./pages/admin/FacultiesManagement";
 import AdminDepartments from "./pages/admin/DepartmentsManagement";
 import AdminHeroSlides from "./pages/admin/HeroSlidesManagement";
 import AdminNoticeCategories from "./pages/admin/NoticeCategoriesManagement";
+import AdminGallery from "./pages/admin/GalleryManagement";
+import AdminTeachers from "./pages/admin/TeachersManagement";
 import TeacherLogin from "./pages/teacher/Login";
 import TeacherRegister from "./pages/teacher/Register";
 import TeacherDashboard from "./pages/teacher/Dashboard";
@@ -121,6 +123,22 @@ const App = () => (
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminNoticeCategories />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/gallery" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminGallery />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/teachers" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminTeachers />
               </ProtectedRoute>
             } 
           />
