@@ -18,9 +18,9 @@ import sstuLogo from '@/assets/sstu-logo.png';
 import { cn } from '@/lib/utils';
 
 const topBarLinks = [
-  { icon: Phone, text: '+880-1234-567890', href: 'tel:+8801234567890' },
+  { icon: Phone, text: '+880-831-52012', href: 'tel:+880831-52012' },
   { icon: Mail, text: 'info@sstu.ac.bd', href: 'mailto:info@sstu.ac.bd' },
-  { icon: MapPin, text: 'Sylhet, Bangladesh', href: '#contact' },
+  { icon: MapPin, text: 'Shantiganj 3000, Sunamganj, Bangladesh', href: '#contact' },
 ];
 
 const academicMegaMenuData = {
