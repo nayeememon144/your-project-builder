@@ -296,21 +296,19 @@ export const Header = () => {
               onMouseEnter={() => setActiveDropdown('Academics')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <div className="container mx-auto py-4 px-4">
-                <div className="grid grid-cols-3 gap-6 max-w-4xl">
+              <div className="container mx-auto py-3 px-4">
+                <div className="grid grid-cols-3 gap-4 max-w-3xl">
                   {/* Academic Information */}
                   <div>
-                    <div className="border-l-4 border-gold pl-3 mb-2">
-                      <h3 className="font-formal font-bold text-primary text-sm">
-                        {academicMegaMenuData.academicInfo.title}
-                      </h3>
-                    </div>
-                    <ul className="space-y-0.5">
+                    <h3 className="font-formal font-semibold text-primary text-xs uppercase tracking-wide border-b border-gold pb-1 mb-1.5">
+                      {academicMegaMenuData.academicInfo.title}
+                    </h3>
+                    <ul>
                       {academicMegaMenuData.academicInfo.items.map((item, idx) => (
                         <li key={idx}>
                           <Link
                             to={item.href}
-                            className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
+                            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
                           >
                             <ChevronRight className="w-3 h-3 text-gray-400" />
                             {item.label}
@@ -322,17 +320,15 @@ export const Header = () => {
 
                   {/* Faculties */}
                   <div>
-                    <div className="border-l-4 border-gold pl-3 mb-2">
-                      <h3 className="font-formal font-bold text-primary text-sm">
-                        {academicMegaMenuData.faculties.title}
-                      </h3>
-                    </div>
-                    <ul className="space-y-0.5">
+                    <h3 className="font-formal font-semibold text-primary text-xs uppercase tracking-wide border-b border-gold pb-1 mb-1.5">
+                      {academicMegaMenuData.faculties.title}
+                    </h3>
+                    <ul>
                       {academicMegaMenuData.faculties.items.map((item, idx) => (
                         <li key={idx}>
                           <Link
                             to={item.href}
-                            className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
+                            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
                           >
                             <ChevronRight className="w-3 h-3 text-gray-400" />
                             {item.label}
@@ -344,17 +340,15 @@ export const Header = () => {
 
                   {/* Departments */}
                   <div>
-                    <div className="border-l-4 border-gold pl-3 mb-2">
-                      <h3 className="font-formal font-bold text-primary text-sm">
-                        {academicMegaMenuData.departments.title}
-                      </h3>
-                    </div>
-                    <ul className="space-y-0.5">
+                    <h3 className="font-formal font-semibold text-primary text-xs uppercase tracking-wide border-b border-gold pb-1 mb-1.5">
+                      {academicMegaMenuData.departments.title}
+                    </h3>
+                    <ul>
                       {academicMegaMenuData.departments.items.map((item, idx) => (
                         <li key={idx}>
                           <Link
                             to={item.href}
-                            className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
+                            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
                           >
                             <ChevronRight className="w-3 h-3 text-gray-400" />
                             {item.label}
