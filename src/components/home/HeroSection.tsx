@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
@@ -19,6 +19,62 @@ const defaultSlides: HeroSlide[] = [
   { id: '2', image_url: campus2 },
   { id: '3', image_url: campus3 },
 ];
+
+// Optimized image component with lazy loading
+const OptimizedHeroImage = ({ 
+  src, 
+  alt, 
+  isActive, 
+  priority = false 
+}: { 
+  src: string; 
+  alt: string; 
+  isActive: boolean; 
+  priority?: boolean;
+}) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string>('');
+
+  // Add optimization parameters for Unsplash images
+  const getOptimizedUrl = useCallback((url: string) => {
+    if (url.includes('unsplash.com')) {
+      // Add WebP format and quality optimization for Unsplash
+      const separator = url.includes('?') ? '&' : '?';
+      return `${url}${separator}fm=webp&q=80&fit=crop&w=1920&h=1080`;
+    }
+    return url;
+  }, []);
+
+  useEffect(() => {
+    // Only load if priority or if becoming active soon
+    if (priority || isActive) {
+      const optimizedUrl = getOptimizedUrl(src);
+      const img = new Image();
+      img.src = optimizedUrl;
+      img.onload = () => {
+        setImageSrc(optimizedUrl);
+        setIsLoaded(true);
+      };
+    }
+  }, [src, isActive, priority, getOptimizedUrl]);
+
+  return (
+    <div 
+      className="absolute inset-0 bg-cover bg-center transition-transform duration-[6000ms] ease-linear"
+      style={{ 
+        backgroundImage: isLoaded ? `url(${imageSrc})` : undefined,
+        backgroundColor: !isLoaded ? '#1a1a2e' : undefined,
+        transform: isActive ? 'scale(1.1)' : 'scale(1)'
+      }}
+    >
+      {!isLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -59,27 +115,32 @@ export const HeroSection = () => {
 
   return (
     <section className="relative h-screen overflow-hidden">
-      {/* Background Slides - Crossfade without white flash */}
-      {slides.map((slide, index) => (
-        <div
-          key={slide.id}
-          className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
-          style={{ 
-            opacity: index === currentSlide ? 1 : 0,
-            zIndex: index === currentSlide ? 1 : 0
-          }}
-        >
-          <div 
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-[6000ms] ease-linear"
+      {/* Background Slides - Optimized with lazy loading */}
+      {slides.map((slide, index) => {
+        const isActive = index === currentSlide;
+        const isNext = index === (currentSlide + 1) % slides.length;
+        const isPrev = index === (currentSlide - 1 + slides.length) % slides.length;
+        
+        return (
+          <div
+            key={slide.id}
+            className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
             style={{ 
-              backgroundImage: `url(${slide.image_url})`,
-              transform: index === currentSlide ? 'scale(1.1)' : 'scale(1)'
+              opacity: isActive ? 1 : 0,
+              zIndex: isActive ? 1 : 0
             }}
-          />
-          {/* Subtle dark gradient overlay - keeps image visible */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50" />
-        </div>
-      ))}
+          >
+            <OptimizedHeroImage 
+              src={slide.image_url}
+              alt={slide.title || `Campus slide ${index + 1}`}
+              isActive={isActive}
+              priority={index === 0 || isNext || isPrev}
+            />
+            {/* Subtle dark gradient overlay - keeps image visible */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50" />
+          </div>
+        );
+      })}
 
       {/* Fixed Content Card - Does NOT animate with slides */}
       <div className="relative z-10 h-full container mx-auto flex items-center justify-center">
