@@ -80,7 +80,7 @@ export const AcademicMegaMenu = () => {
       <div className="grid grid-cols-3 divide-x divide-gray-100">
         {/* Academic Information */}
         <div className="py-1">
-          <div className="px-4 py-1.5 text-xs font-semibold text-primary uppercase tracking-wide">
+          <div className="px-4 py-1.5 text-sm font-semibold text-primary">
             Academic Information
           </div>
           {academicInfoItems.map((item, idx) => (
@@ -90,7 +90,7 @@ export const AcademicMegaMenu = () => {
 
         {/* Faculties */}
         <div className="py-1">
-          <div className="px-4 py-1.5 text-xs font-semibold text-primary uppercase tracking-wide">
+          <div className="px-4 py-1.5 text-sm font-semibold text-primary">
             Faculties
           </div>
           {faculties.length > 0 ? (
@@ -109,7 +109,7 @@ export const AcademicMegaMenu = () => {
 
         {/* Departments */}
         <div className="py-1">
-          <div className="px-4 py-1.5 text-xs font-semibold text-primary uppercase tracking-wide">
+          <div className="px-4 py-1.5 text-sm font-semibold text-primary">
             Departments
           </div>
           {departments.length > 0 ? (
