@@ -213,12 +213,9 @@ export const Header = () => {
                 <img src={sstuLogo} alt="SSTU Logo" className="w-full h-full object-contain" />
               </div>
               <div className="hidden sm:block">
-                <h1 className="font-display text-lg font-bold text-white leading-tight">
-                  SSTU
-                </h1>
-                <p className="text-xs text-white/80">
+                <h1 className="font-serif text-base md:text-lg font-semibold text-white leading-tight tracking-wide">
                   Sunamgonj Science and Technology University
-                </p>
+                </h1>
               </div>
             </Link>
 

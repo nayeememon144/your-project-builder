@@ -1,19 +1,22 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import campus1 from '@/assets/campus/campus-1.jpg';
+import campus2 from '@/assets/campus/campus-2.jpg';
+import campus3 from '@/assets/campus/campus-3.jpg';
 
 const defaultSlides = [
   {
     id: '1',
-    image_url: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80',
+    image_url: campus1,
   },
   {
     id: '2',
-    image_url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80',
+    image_url: campus2,
   },
   {
     id: '3',
-    image_url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80',
+    image_url: campus3,
   },
 ];
 
@@ -93,7 +96,7 @@ export const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="font-display text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight"
+              className="font-formal text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-wide"
             >
               Sunamgonj Science and
               <br />

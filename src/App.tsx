@@ -7,9 +7,15 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AdminNotices from "./pages/admin/NoticesManagement";
+import AdminNews from "./pages/admin/NewsManagement";
+import AdminFaculties from "./pages/admin/FacultiesManagement";
+import AdminDepartments from "./pages/admin/DepartmentsManagement";
 import TeacherLogin from "./pages/teacher/Login";
+import TeacherRegister from "./pages/teacher/Register";
 import TeacherDashboard from "./pages/teacher/Dashboard";
 import StudentLogin from "./pages/student/Login";
+import StudentRegister from "./pages/student/Register";
 import StudentDashboard from "./pages/student/Dashboard";
 import NoticesPage from "./pages/Notices";
 import NoticeDetailPage from "./pages/NoticeDetail";
@@ -55,6 +61,8 @@ const App = () => (
           <Route path="/facilities/*" element={<About />} />
           <Route path="/centers/*" element={<Research />} />
           <Route path="/institutes/*" element={<Academic />} />
+          
+          {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route 
             path="/admin/dashboard" 
@@ -64,13 +72,52 @@ const App = () => (
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/admin/notices" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminNotices />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/news" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminNews />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/faculties" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminFaculties />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/departments" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDepartments />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/admin/*" element={<AdminDashboard />} />
+          
+          {/* Teacher Routes */}
           <Route path="/teacher/login" element={<TeacherLogin />} />
+          <Route path="/teacher/register" element={<TeacherRegister />} />
           <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
           <Route path="/teacher/*" element={<TeacherDashboard />} />
+          
+          {/* Student Routes */}
           <Route path="/student/login" element={<StudentLogin />} />
+          <Route path="/student/register" element={<StudentRegister />} />
           <Route path="/student/dashboard" element={<StudentDashboard />} />
           <Route path="/student/*" element={<StudentDashboard />} />
+          
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
