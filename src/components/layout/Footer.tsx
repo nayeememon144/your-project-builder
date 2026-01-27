@@ -132,7 +132,7 @@ export const Footer = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-white">Sunamgonj Science & Technology University</h4>
-                    <p className="text-sm text-primary-foreground/70">Sunamgonj, Sylhet, Bangladesh</p>
+                    <p className="text-sm text-primary-foreground/70">Shantiganj 3000, Sunamganj, Bangladesh</p>
                   </div>
                 </div>
                 
