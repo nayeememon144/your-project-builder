@@ -244,6 +244,22 @@ export const Header = () => {
                       </motion.div>
                     )}
                   </AnimatePresence>
+
+                  {/* Academic Mega Menu - Positioned under Academics button */}
+                  <AnimatePresence>
+                    {activeDropdown === 'Academics' && item.hasMegaMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute left-0 top-full bg-white rounded-b-lg shadow-xl z-50"
+                        style={{ minWidth: '580px' }}
+                      >
+                        <AcademicMegaMenu />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               ))}
             </div>
@@ -258,23 +274,6 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* Academic Mega Menu - Positioned under Academics nav item */}
-        <AnimatePresence>
-          {activeDropdown === 'Academics' && (
-            <motion.div
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -5 }}
-              transition={{ duration: 0.15 }}
-              className="absolute left-1/2 -translate-x-1/2 top-full bg-white rounded-b-lg shadow-xl z-50"
-              style={{ minWidth: '580px' }}
-              onMouseEnter={() => setActiveDropdown('Academics')}
-              onMouseLeave={() => setActiveDropdown(null)}
-            >
-              <AcademicMegaMenu />
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* Mobile Menu */}
         <AnimatePresence>
