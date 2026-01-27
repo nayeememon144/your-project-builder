@@ -39,7 +39,7 @@ export const AtAGlanceSection = () => {
               SSTU - At a Glance
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
-              Shaikh Burhanuddin Science and Technology University (SSTU) is one of the 
+              Sunamgonj Science and Technology University (SSTU) is one of the 
               leading public universities in Bangladesh, established with a vision to 
               provide quality higher education and contribute to the nation's development 
               through research and innovation.

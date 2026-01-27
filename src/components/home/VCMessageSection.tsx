@@ -40,7 +40,7 @@ export const VCMessageSection = () => {
               MESSAGE FROM VICE-CHANCELLOR
             </h2>
             <p className="text-white/90 leading-relaxed mb-6 max-w-3xl">
-              I am delighted to welcome you all to the official website of Shaikh Burhanuddin 
+              I am delighted to welcome you all to the official website of Sunamgonj 
               Science and Technology University. The university will award you not only academic 
               degrees but will enrich you culturally, professionally, and morally. I am proud to 
               say that SSTU is dedicated to nurturing innovative minds and contributing to the 

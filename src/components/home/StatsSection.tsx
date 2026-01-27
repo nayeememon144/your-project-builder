@@ -70,7 +70,7 @@ export const StatsSection = () => {
               SSTU AT A GLANCE
             </h2>
             <p className="text-muted-foreground leading-relaxed">
-              Shaikh Burhanuddin Science and Technology University is a prominent 
+              Sunamgonj Science and Technology University is a prominent 
               university of Bangladesh. It is situated alongside the Chittagong-Sylhet 
               Highway, about 25km away from Sylhet, Bangladesh.
             </p>
