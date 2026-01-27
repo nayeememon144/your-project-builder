@@ -2,95 +2,119 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* SSTU University Design System - Sophisticated Academic Theme */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core University Colors - Deep Navy & Emerald Theme */
+    --background: 210 25% 97%;
+    --foreground: 220 25% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 25% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 220 25% 12%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary - Deep Navy (Institutional Trust) */
+    --primary: 220 60% 22%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Light Gray Blue */
+    --secondary: 210 30% 94%;
+    --secondary-foreground: 220 25% 20%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted */
+    --muted: 210 25% 93%;
+    --muted-foreground: 220 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent - Emerald (Growth/Education) */
+    --accent: 160 60% 35%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Gold - Excellence/Achievement */
+    --gold: 42 85% 50%;
+    --gold-foreground: 220 25% 12%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Destructive */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    --border: 214.3 31.8% 88%;
+    --input: 214.3 31.8% 88%;
+    --ring: 220 60% 22%;
 
-    --sidebar-background: 0 0% 98%;
+    --radius: 0.75rem;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Sidebar - Admin Dashboard */
+    --sidebar-background: 220 60% 18%;
+    --sidebar-foreground: 210 25% 95%;
+    --sidebar-primary: 160 60% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 50% 25%;
+    --sidebar-accent-foreground: 210 25% 95%;
+    --sidebar-border: 220 40% 25%;
+    --sidebar-ring: 160 60% 45%;
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Custom Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(220 60% 22%) 0%, hsl(220 50% 35%) 50%, hsl(160 50% 30%) 100%);
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%) 0%, hsl(210 30% 98%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(42 85% 50%) 0%, hsl(38 90% 55%) 100%);
+    --gradient-cta: linear-gradient(135deg, hsl(160 60% 35%) 0%, hsl(160 50% 45%) 100%);
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 hsl(220 25% 12% / 0.05);
+    --shadow-md: 0 4px 6px -1px hsl(220 25% 12% / 0.1), 0 2px 4px -2px hsl(220 25% 12% / 0.1);
+    --shadow-lg: 0 10px 15px -3px hsl(220 25% 12% / 0.1), 0 4px 6px -4px hsl(220 25% 12% / 0.1);
+    --shadow-xl: 0 20px 25px -5px hsl(220 25% 12% / 0.15), 0 8px 10px -6px hsl(220 25% 12% / 0.1);
+    --shadow-gold: 0 4px 20px -2px hsl(42 85% 50% / 0.4);
+    --shadow-card-hover: 0 20px 40px -10px hsl(220 25% 12% / 0.2);
 
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Typography */
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-bengali: 'Noto Sans Bengali', sans-serif;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 222 47% 8%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 220 40% 12%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 220 40% 12%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 160 60% 45%;
+    --primary-foreground: 220 25% 10%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 220 35% 18%;
+    --secondary-foreground: 210 40% 95%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 220 30% 15%;
+    --muted-foreground: 215 20% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 42 85% 55%;
+    --accent-foreground: 220 25% 10%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 62.8% 45%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: 220 30% 20%;
+    --input: 220 30% 20%;
+    --ring: 160 60% 45%;
+
+    --sidebar-background: 220 50% 10%;
+    --sidebar-foreground: 210 30% 95%;
+    --sidebar-primary: 160 60% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 220 40% 18%;
+    --sidebar-accent-foreground: 210 30% 95%;
+    --sidebar-border: 220 35% 18%;
+    --sidebar-ring: 160 60% 50%;
   }
 }
 
@@ -99,7 +123,173 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
-  body {
-    @apply bg-background text-foreground;
+  html {
+    scroll-behavior: smooth;
   }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-semibold tracking-tight;
+  }
+
+  /* Bengali typography support */
+  .bengali {
+    font-family: var(--font-bengali);
+  }
+}
+
+@layer components {
+  /* Hero Patterns */
+  .hero-pattern {
+    background-image: 
+      radial-gradient(circle at 20% 50%, hsl(160 60% 35% / 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 50%, hsl(42 85% 50% / 0.1) 0%, transparent 50%),
+      var(--gradient-hero);
+  }
+
+  /* Glass morphism */
+  .glass {
+    @apply bg-white/80 backdrop-blur-md border border-white/20;
+  }
+
+  .glass-dark {
+    @apply bg-primary/80 backdrop-blur-md border border-white/10;
+  }
+
+  /* Animated underline for links */
+  .link-underline {
+    @apply relative;
+  }
+
+  .link-underline::after {
+    @apply content-[''] absolute bottom-0 left-0 w-0 h-0.5 bg-accent transition-all duration-300;
+  }
+
+  .link-underline:hover::after {
+    @apply w-full;
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-hover:hover {
+    @apply -translate-y-1;
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  /* Golden accent border */
+  .golden-border {
+    @apply border-2;
+    border-image: var(--gradient-gold) 1;
+  }
+
+  /* Stats counter animation */
+  .stat-number {
+    @apply font-display text-4xl md:text-5xl font-bold;
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Navigation mega menu */
+  .mega-menu-enter {
+    animation: megaMenuEnter 0.25s ease-out;
+  }
+
+  @keyframes megaMenuEnter {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Notice card styles */
+  .notice-urgent {
+    @apply border-l-4 border-destructive;
+  }
+
+  .notice-featured {
+    @apply border-l-4;
+    border-left-color: hsl(var(--gold));
+  }
+
+  /* Section dividers */
+  .section-divider {
+    @apply relative py-16;
+  }
+
+  .section-divider::before {
+    @apply content-[''] absolute top-0 left-1/2 -translate-x-1/2 w-24 h-1 rounded-full;
+    background: var(--gradient-gold);
+  }
+
+  /* Admin dashboard cards */
+  .dashboard-card {
+    @apply bg-card rounded-xl p-6 shadow-md border border-border/50;
+    background: var(--gradient-card);
+  }
+
+  /* Button variants */
+  .btn-golden {
+    @apply text-primary font-semibold py-3 px-6 rounded-lg transition-all duration-300;
+    background: var(--gradient-gold);
+    box-shadow: var(--shadow-gold);
+  }
+
+  .btn-golden:hover {
+    @apply scale-105;
+    box-shadow: 0 6px 25px -3px hsl(42 85% 50% / 0.5);
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}
+
+@layer utilities {
+  /* Text gradient */
+  .text-gradient-gold {
+    background: var(--gradient-gold);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient-primary {
+    background: var(--gradient-hero);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Animation delays */
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
 }
