@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import sstuLogo from '@/assets/sstu-logo.png';
 
 const defaultSlides = [
   {
@@ -40,44 +39,38 @@ export const HeroSection = () => {
 
   return (
     <section className="relative h-[80vh] min-h-[600px] overflow-hidden">
-      {/* Background Slides with Zoom Animation */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentSlide}
-          initial={{ scale: 1.05, opacity: 0 }}
-          animate={{ scale: 1.15, opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ 
-            scale: { duration: 6, ease: "linear" },
-            opacity: { duration: 0.8 }
+      {/* Background Slides - Crossfade without white flash */}
+      {slides.map((slide, index) => (
+        <div
+          key={slide.id}
+          className="absolute inset-0 transition-opacity duration-1000 ease-in-out"
+          style={{ 
+            opacity: index === currentSlide ? 1 : 0,
+            zIndex: index === currentSlide ? 1 : 0
           }}
-          className="absolute inset-0"
         >
-          <div 
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${slides[currentSlide].image_url})` }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/60 to-primary/80" />
-        </motion.div>
-      </AnimatePresence>
-
-      {/* Fixed Content Card - Does NOT animate with slides */}
-      <div className="relative h-full container mx-auto flex items-center justify-center">
-        <div className="text-center">
-          {/* Logo */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="flex justify-center mb-6"
+            className="absolute inset-0"
+            animate={{ 
+              scale: index === currentSlide ? 1.1 : 1 
+            }}
+            transition={{ 
+              duration: 6, 
+              ease: "linear" 
+            }}
           >
-            <img 
-              src={sstuLogo} 
-              alt="SSTU Logo" 
-              className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-lg"
+            <div 
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url(${slide.image_url})` }}
             />
           </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/60 via-primary/50 to-primary/70" />
+        </div>
+      ))}
 
+      {/* Fixed Content Card - Does NOT animate with slides */}
+      <div className="relative z-10 h-full container mx-auto flex items-center justify-center">
+        <div className="text-center">
           {/* Glass Card with University Name */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -106,16 +99,6 @@ export const HeroSection = () => {
               <br />
               Technology University
             </motion.h1>
-
-            {/* Bengali Name */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.7 }}
-              className="bengali text-white/80 text-lg md:text-xl mt-4"
-            >
-              সুনামগঞ্জ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়
-            </motion.p>
           </motion.div>
         </div>
       </div>
@@ -123,21 +106,21 @@ export const HeroSection = () => {
       {/* Navigation Arrows */}
       <button
         onClick={prevSlide}
-        className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all"
+        className="absolute z-20 left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all"
         aria-label="Previous slide"
       >
         <ChevronLeft className="w-6 h-6" />
       </button>
       <button
         onClick={nextSlide}
-        className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all"
+        className="absolute z-20 right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all"
         aria-label="Next slide"
       >
         <ChevronRight className="w-6 h-6" />
       </button>
 
       {/* Slide Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3">
+      <div className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 flex gap-3">
         {slides.map((_, idx) => (
           <button
             key={idx}

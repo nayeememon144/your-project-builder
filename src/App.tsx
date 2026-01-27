@@ -8,7 +8,9 @@ import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import TeacherLogin from "./pages/teacher/Login";
+import TeacherDashboard from "./pages/teacher/Dashboard";
 import StudentLogin from "./pages/student/Login";
+import StudentDashboard from "./pages/student/Dashboard";
 import NoticesPage from "./pages/Notices";
 import NoticeDetailPage from "./pages/NoticeDetail";
 import About from "./pages/About";
@@ -64,9 +66,11 @@ const App = () => (
           />
           <Route path="/admin/*" element={<AdminDashboard />} />
           <Route path="/teacher/login" element={<TeacherLogin />} />
-          <Route path="/teacher/*" element={<TeacherLogin />} />
+          <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+          <Route path="/teacher/*" element={<TeacherDashboard />} />
           <Route path="/student/login" element={<StudentLogin />} />
-          <Route path="/student/*" element={<StudentLogin />} />
+          <Route path="/student/dashboard" element={<StudentDashboard />} />
+          <Route path="/student/*" element={<StudentDashboard />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
