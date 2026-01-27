@@ -79,29 +79,43 @@ export const HeroSection = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-primary/40 backdrop-blur-md rounded-2xl px-8 py-10 md:px-16 md:py-12 border border-white/10 shadow-2xl max-w-4xl mx-4"
+            className="bg-primary/40 backdrop-blur-md rounded-2xl px-8 py-10 md:px-16 md:py-14 border border-white/10 shadow-2xl max-w-5xl mx-4"
           >
-            {/* Welcome Text */}
+            {/* Welcome Text - Smaller */}
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="text-gold font-semibold tracking-[0.3em] uppercase text-sm md:text-base mb-4"
+              className="text-white/80 tracking-[0.2em] uppercase text-xs md:text-sm mb-3"
             >
               Welcome To
             </motion.p>
 
-            {/* University Name */}
+            {/* University Name - Highlighted and Prominent */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="font-formal text-2xl md:text-4xl lg:text-5xl font-bold text-white leading-tight tracking-wide"
+              className="font-formal text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-wide mb-4"
             >
-              Sunamgonj Science and
+              <span className="text-gold">Sunamgonj</span> Science and
               <br />
               Technology University
             </motion.h1>
+
+            {/* Location */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="text-white/70 text-sm md:text-base flex items-center justify-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Sunamganj, Sylhet, Bangladesh
+            </motion.p>
           </motion.div>
         </div>
       </div>

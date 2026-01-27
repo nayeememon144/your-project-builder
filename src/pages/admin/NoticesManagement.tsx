@@ -12,7 +12,10 @@ import {
   Search,
   Eye,
   Pin,
-  Calendar
+  Calendar,
+  Upload,
+  FileText,
+  X
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -29,6 +32,12 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 
+interface Attachment {
+  name: string;
+  url: string;
+  type: string;
+}
+
 interface Notice {
   id: string;
   title: string;
@@ -42,6 +51,7 @@ interface Notice {
   created_at: string;
   views: number;
   category_id: string | null;
+  attachments: Attachment[] | null;
 }
 
 interface NoticeCategory {
@@ -57,6 +67,7 @@ const NoticesManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingNotice, setEditingNotice] = useState<Notice | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     title_bn: '',
@@ -66,6 +77,7 @@ const NoticesManagement = () => {
     is_pinned: false,
     is_featured: false,
     category_id: '',
+    attachments: [] as Attachment[],
   });
 
   useEffect(() => {
@@ -83,7 +95,12 @@ const NoticesManagement = () => {
     if (error) {
       toast.error('Failed to fetch notices');
     } else {
-      setNotices(data || []);
+      // Cast the data to match our Notice interface
+      const typedData = (data || []).map(notice => ({
+        ...notice,
+        attachments: notice.attachments as unknown as Attachment[] | null,
+      })) as Notice[];
+      setNotices(typedData);
     }
     setLoading(false);
   };
@@ -99,12 +116,67 @@ const NoticesManagement = () => {
     }
   };
 
+  const uploadFile = async (file: File): Promise<Attachment> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `notice-${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+    const filePath = `notices/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('attachments')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage.from('attachments').getPublicUrl(filePath);
+    return {
+      name: file.name,
+      url: data.publicUrl,
+      type: file.type,
+    };
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    try {
+      const newAttachments: Attachment[] = [];
+      for (const file of Array.from(files)) {
+        const attachment = await uploadFile(file);
+        newAttachments.push(attachment);
+      }
+      setFormData({
+        ...formData,
+        attachments: [...formData.attachments, ...newAttachments],
+      });
+      toast.success('Files uploaded successfully');
+    } catch (error: any) {
+      toast.error('Failed to upload file: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeAttachment = (index: number) => {
+    const updated = [...formData.attachments];
+    updated.splice(index, 1);
+    setFormData({ ...formData, attachments: updated });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const noticeData = {
-      ...formData,
+      title: formData.title,
+      title_bn: formData.title_bn || null,
+      description: formData.description,
+      description_bn: formData.description_bn || null,
+      status: formData.status,
+      is_pinned: formData.is_pinned,
+      is_featured: formData.is_featured,
       category_id: formData.category_id || null,
+      attachments: formData.attachments.length > 0 ? JSON.parse(JSON.stringify(formData.attachments)) : null,
       published_at: formData.status === 'published' ? new Date().toISOString() : null,
     };
 
@@ -155,6 +227,9 @@ const NoticesManagement = () => {
 
   const handleEdit = (notice: Notice) => {
     setEditingNotice(notice);
+    const attachments = notice.attachments 
+      ? (Array.isArray(notice.attachments) ? notice.attachments : [])
+      : [];
     setFormData({
       title: notice.title,
       title_bn: notice.title_bn || '',
@@ -164,6 +239,7 @@ const NoticesManagement = () => {
       is_pinned: notice.is_pinned,
       is_featured: notice.is_featured,
       category_id: notice.category_id || '',
+      attachments: attachments as Attachment[],
     });
     setIsDialogOpen(true);
   };
@@ -179,6 +255,7 @@ const NoticesManagement = () => {
       is_pinned: false,
       is_featured: false,
       category_id: '',
+      attachments: [],
     });
   };
 
@@ -320,6 +397,38 @@ const NoticesManagement = () => {
                     />
                     <Label htmlFor="is_featured">Featured</Label>
                   </div>
+                </div>
+
+                {/* File Attachments */}
+                <div className="space-y-2">
+                  <Label>Attachments (PDF, Documents)</Label>
+                  <div className="flex items-center gap-4">
+                    <Input
+                      type="file"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+                      multiple
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                    />
+                    {uploading && <span className="text-sm text-muted-foreground">Uploading...</span>}
+                  </div>
+                  {formData.attachments.length > 0 && (
+                    <div className="mt-2 space-y-2">
+                      {formData.attachments.map((attachment, idx) => (
+                        <div key={idx} className="flex items-center justify-between bg-muted/50 p-2 rounded">
+                          <div className="flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-muted-foreground" />
+                            <a href={attachment.url} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                              {attachment.name}
+                            </a>
+                          </div>
+                          <Button type="button" variant="ghost" size="icon" onClick={() => removeAttachment(idx)}>
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 <DialogFooter>

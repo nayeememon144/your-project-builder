@@ -11,6 +11,8 @@ import AdminNotices from "./pages/admin/NoticesManagement";
 import AdminNews from "./pages/admin/NewsManagement";
 import AdminFaculties from "./pages/admin/FacultiesManagement";
 import AdminDepartments from "./pages/admin/DepartmentsManagement";
+import AdminHeroSlides from "./pages/admin/HeroSlidesManagement";
+import AdminNoticeCategories from "./pages/admin/NoticeCategoriesManagement";
 import TeacherLogin from "./pages/teacher/Login";
 import TeacherRegister from "./pages/teacher/Register";
 import TeacherDashboard from "./pages/teacher/Dashboard";
@@ -19,6 +21,8 @@ import StudentRegister from "./pages/student/Register";
 import StudentDashboard from "./pages/student/Dashboard";
 import NoticesPage from "./pages/Notices";
 import NoticeDetailPage from "./pages/NoticeDetail";
+import TeacherProfile from "./pages/TeacherProfile";
+import Teachers from "./pages/Teachers";
 import About from "./pages/About";
 import Academic from "./pages/Academic";
 import Admission from "./pages/Admission";
@@ -104,7 +108,27 @@ const App = () => (
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/admin/hero-slides" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminHeroSlides />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/notice-categories" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminNoticeCategories />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/admin/*" element={<AdminDashboard />} />
+
+          {/* Public Teacher Pages */}
+          <Route path="/teachers" element={<Teachers />} />
+          <Route path="/teachers/:id" element={<TeacherProfile />} />
           
           {/* Teacher Routes */}
           <Route path="/teacher/login" element={<TeacherLogin />} />

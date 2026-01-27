@@ -283,7 +283,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* Academic Mega Menu - Contained Panel */}
+        {/* Academic Mega Menu - Left-Aligned Panel like SSTU */}
         <AnimatePresence>
           {activeDropdown === 'Academics' && (
             <motion.div
@@ -291,20 +291,21 @@ export const Header = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute left-1/2 -translate-x-1/2 top-full bg-white shadow-2xl z-50 overflow-hidden rounded-b-lg border border-gray-200 max-w-5xl w-full"
+              className="absolute left-0 top-full bg-white shadow-2xl z-50 overflow-hidden border-t-4 border-gold"
+              style={{ width: 'calc(100vw - 2rem)', maxWidth: '1200px' }}
               onMouseEnter={() => setActiveDropdown('Academics')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
               <div className="p-6">
-                <div className="grid grid-cols-12 gap-8">
+                <div className="grid grid-cols-12 gap-6">
                   {/* Academic Information */}
                   <div className="col-span-3">
                     <div className="border-l-4 border-gold pl-4 mb-4">
-                      <h3 className="font-display font-semibold text-primary text-lg">
+                      <h3 className="font-formal font-bold text-primary text-base">
                         {academicMegaMenuData.academicInfo.title}
                       </h3>
                     </div>
-                    <ul className="space-y-2">
+                    <ul className="space-y-1">
                       {academicMegaMenuData.academicInfo.items.map((item, idx) => (
                         <li key={idx}>
                           <Link
@@ -322,11 +323,11 @@ export const Header = () => {
                   {/* Faculties */}
                   <div className="col-span-5">
                     <div className="border-l-4 border-gold pl-4 mb-4">
-                      <h3 className="font-display font-semibold text-primary text-lg">
+                      <h3 className="font-formal font-bold text-primary text-base">
                         {academicMegaMenuData.faculties.title}
                       </h3>
                     </div>
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-2">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                       {academicMegaMenuData.faculties.items.map((item, idx) => (
                         <Link
                           key={idx}
@@ -342,13 +343,13 @@ export const Header = () => {
 
                   {/* Institutes & Centers */}
                   <div className="col-span-4">
-                    <div className="bg-gray-50 rounded-lg p-5">
+                    <div className="bg-gray-50 rounded-lg p-4">
                       {/* Institutes */}
-                      <div className="mb-6">
-                        <h3 className="font-display font-semibold text-gray-800 mb-3">
+                      <div className="mb-4">
+                        <h3 className="font-formal font-bold text-gray-800 mb-2 text-sm">
                           {academicMegaMenuData.institutes.title}
                         </h3>
-                        <ul className="space-y-2">
+                        <ul className="space-y-1">
                           {academicMegaMenuData.institutes.items.map((item, idx) => (
                             <li key={idx}>
                               <Link
@@ -364,10 +365,10 @@ export const Header = () => {
                       </div>
                       {/* Centers */}
                       <div>
-                        <h3 className="font-display font-semibold text-gray-800 mb-3">
+                        <h3 className="font-formal font-bold text-gray-800 mb-2 text-sm">
                           {academicMegaMenuData.centers.title}
                         </h3>
-                        <ul className="space-y-2">
+                        <ul className="space-y-1">
                           {academicMegaMenuData.centers.items.map((item, idx) => (
                             <li key={idx}>
                               <Link
@@ -385,14 +386,14 @@ export const Header = () => {
                   </div>
                 </div>
 
-                {/* Departments Section */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                  <div className="border-l-4 border-gold pl-4 mb-4">
-                    <h3 className="font-display font-semibold text-primary text-lg">
+                {/* Departments Section - Bottom */}
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="border-l-4 border-gold pl-4 mb-3">
+                    <h3 className="font-formal font-bold text-primary text-base">
                       {academicMegaMenuData.departments.title}
                     </h3>
                   </div>
-                  <div className="grid grid-cols-4 gap-x-8 gap-y-2">
+                  <div className="grid grid-cols-4 gap-x-6 gap-y-1">
                     {academicMegaMenuData.departments.items.map((item, idx) => (
                       <Link
                         key={idx}
