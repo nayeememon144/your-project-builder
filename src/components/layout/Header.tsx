@@ -120,7 +120,7 @@ export const Header = () => {
   const [portalMenuOpen, setPortalMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50">
+    <header className="fixed top-0 left-0 right-0 z-50">
       {/* Top Bar */}
       <div className="bg-primary text-primary-foreground py-2 hidden lg:block">
         <div className="container mx-auto flex justify-between items-center text-sm">
