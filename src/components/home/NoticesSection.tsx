@@ -12,57 +12,15 @@ interface Notice {
   published_at: string;
   is_pinned: boolean;
   is_featured: boolean;
-  category?: {
+  notice_categories: {
     name: string;
     slug: string;
-  };
+  } | null;
 }
 
-const sampleNotices: Notice[] = [
-  {
-    id: '1',
-    title: 'বাংলাদেশ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগ বিজ্ঞপ্তি',
-    published_at: new Date().toISOString(),
-    is_pinned: true,
-    is_featured: true,
-    category: { name: 'Recruitment', slug: 'recruitment' }
-  },
-  {
-    id: '2',
-    title: 'সকল বিভাগের জন্য ফাইনাল পরীক্ষার সময়সূচী',
-    published_at: new Date(Date.now() - 86400000).toISOString(),
-    is_pinned: false,
-    is_featured: false,
-    category: { name: 'Exam', slug: 'exam' }
-  },
-  {
-    id: '3',
-    title: 'Scholarship Applications Open for Academic Year 2025-26',
-    published_at: new Date(Date.now() - 172800000).toISOString(),
-    is_pinned: false,
-    is_featured: false,
-    category: { name: 'Scholarship', slug: 'scholarship' }
-  },
-  {
-    id: '4',
-    title: 'গবেষণা কর্মশালার জন্য নিবন্ধন শুরু',
-    published_at: new Date(Date.now() - 259200000).toISOString(),
-    is_pinned: false,
-    is_featured: false,
-    category: { name: 'Workshop', slug: 'workshop' }
-  },
-  {
-    id: '5',
-    title: 'Annual Sports Competition Registration Notice',
-    published_at: new Date(Date.now() - 345600000).toISOString(),
-    is_pinned: false,
-    is_featured: false,
-    category: { name: 'Sports', slug: 'sports' }
-  },
-];
-
 export const NoticesSection = () => {
-  const [notices, setNotices] = useState<Notice[]>(sampleNotices);
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchNotices = async () => {
@@ -81,16 +39,49 @@ export const NoticesSection = () => {
         .order('published_at', { ascending: false })
         .limit(5);
 
-      if (!error && data && data.length > 0) {
-        setNotices(data.map(n => ({
-          ...n,
-          category: n.notice_categories
-        })));
+      if (!error && data) {
+        setNotices(data);
       }
+      setLoading(false);
     };
 
     fetchNotices();
   }, []);
+
+  if (loading) {
+    return (
+      <section className="py-16 bg-white">
+        <div className="container mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground uppercase tracking-wide">
+              Latest Notices
+            </h2>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-8 text-center">
+            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading notices...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (notices.length === 0) {
+    return (
+      <section className="py-16 bg-white">
+        <div className="container mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground uppercase tracking-wide">
+              Latest Notices
+            </h2>
+          </div>
+          <div className="bg-gray-50 rounded-lg p-8 text-center">
+            <p className="text-muted-foreground">No notices available at the moment.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-white">
@@ -137,6 +128,11 @@ export const NoticesSection = () => {
                   <p className="text-foreground font-medium group-hover:text-primary transition-colors line-clamp-2">
                     {notice.title}
                   </p>
+                  {notice.notice_categories && (
+                    <span className="text-xs text-muted-foreground">
+                      {notice.notice_categories.name}
+                    </span>
+                  )}
                 </div>
 
                 {/* Actions */}
