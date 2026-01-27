@@ -14,6 +14,7 @@ import {
   LogIn,
   ChevronRight
 } from 'lucide-react';
+import sstuLogo from '@/assets/sstu-logo.png';
 import { cn } from '@/lib/utils';
 
 const topBarLinks = [
@@ -208,15 +209,15 @@ export const Header = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-                <GraduationCap className="w-7 h-7 text-primary" />
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center p-1">
+                <img src={sstuLogo} alt="SSTU Logo" className="w-full h-full object-contain" />
               </div>
               <div className="hidden sm:block">
                 <h1 className="font-display text-lg font-bold text-white leading-tight">
                   SSTU
                 </h1>
                 <p className="text-xs text-white/80">
-                  Shaikh Burhanuddin Post Graduate College
+                  Sunamgonj Science and Technology University
                 </p>
               </div>
             </Link>

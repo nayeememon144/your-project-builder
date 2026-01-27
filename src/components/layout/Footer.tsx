@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import { 
-  GraduationCap, 
   MapPin, 
   Phone, 
   Mail, 
@@ -11,6 +10,7 @@ import {
   ChevronRight,
   ExternalLink
 } from 'lucide-react';
+import sstuLogo from '@/assets/sstu-logo.png';
 
 const academicsLinks = [
   { label: 'All Departments', href: '/departments' },
@@ -125,22 +125,21 @@ export const Footer = () => {
               Contact Us
             </h3>
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Contact Info */}
               <div>
                 <div className="flex items-start gap-3 mb-4">
-                  <div className="w-10 h-10 bg-gold/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <GraduationCap className="w-5 h-5 text-gold" />
+                  <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center flex-shrink-0 p-1">
+                    <img src={sstuLogo} alt="SSTU Logo" className="w-full h-full object-contain" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white">Shaikh Burhanuddin Science & Technology University</h4>
-                    <p className="text-sm text-primary-foreground/70">Habiganj, Sylhet, Bangladesh</p>
+                    <h4 className="font-semibold text-white">Sunamgonj Science & Technology University</h4>
+                    <p className="text-sm text-primary-foreground/70">Sunamgonj, Sylhet, Bangladesh</p>
                   </div>
                 </div>
                 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-sm">
                     <MapPin className="w-4 h-4 text-gold" />
-                    <span className="text-primary-foreground/80">Habiganj Sadar, Sylhet Division</span>
+                    <span className="text-primary-foreground/80">Sunamgonj Sadar, Sylhet Division</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="w-4 h-4 text-gold" />
@@ -196,7 +195,7 @@ export const Footer = () => {
         <div className="container mx-auto py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-primary-foreground/70">
             <p>
-              © {new Date().getFullYear()} Shaikh Burhanuddin Science & Technology University. All rights reserved.
+              © {new Date().getFullYear()} Sunamgonj Science & Technology University. All rights reserved.
             </p>
             <div className="flex items-center gap-4">
               <Link to="/privacy" className="hover:text-gold transition-colors">Privacy Policy</Link>
