@@ -9,6 +9,9 @@ import AdminLogin from "./pages/admin/Login";
 import AdminDashboard from "./pages/admin/Dashboard";
 import TeacherLogin from "./pages/teacher/Login";
 import StudentLogin from "./pages/student/Login";
+import NoticesPage from "./pages/Notices";
+import NoticeDetailPage from "./pages/NoticeDetail";
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -20,8 +23,17 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/notices" element={<NoticesPage />} />
+          <Route path="/notices/:id" element={<NoticeDetailPage />} />
           <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route 
+            path="/admin/dashboard" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/teacher/login" element={<TeacherLogin />} />
           <Route path="/student/login" element={<StudentLogin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
