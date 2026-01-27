@@ -247,7 +247,13 @@ export const Header = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute left-0 top-full bg-white rounded-b-lg shadow-xl min-w-56 z-50 overflow-hidden"
+                        className={cn(
+                          "absolute top-full bg-white rounded-b-lg shadow-xl min-w-56 z-50 overflow-hidden",
+                          // Position right-aligned dropdowns (About, Notices) to prevent overflow
+                          item.label === 'About' || item.label === 'Notices' 
+                            ? "right-0" 
+                            : "left-0"
+                        )}
                       >
                         <div className="py-2">
                           {item.dropdown.map((subItem, idx) => (
@@ -278,7 +284,7 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* Academic Mega Menu - Left-Aligned Panel like SSTU */}
+        {/* Academic Mega Menu - Centered under navbar */}
         <AnimatePresence>
           {activeDropdown === 'Academics' && (
             <motion.div
@@ -286,15 +292,14 @@ export const Header = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute left-0 top-full bg-white shadow-2xl z-50 overflow-hidden border-t-4 border-gold"
-              style={{ width: 'calc(100vw - 2rem)', maxWidth: '1200px' }}
+              className="absolute left-0 right-0 top-full bg-white shadow-2xl z-50 overflow-hidden border-t-4 border-gold"
               onMouseEnter={() => setActiveDropdown('Academics')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <div className="p-6">
-                <div className="grid grid-cols-12 gap-6">
+              <div className="container mx-auto py-6 px-4">
+                <div className="grid grid-cols-3 gap-8 max-w-4xl">
                   {/* Academic Information */}
-                  <div className="col-span-4">
+                  <div>
                     <div className="border-l-4 border-gold pl-4 mb-4">
                       <h3 className="font-formal font-bold text-primary text-base">
                         {academicMegaMenuData.academicInfo.title}
@@ -316,7 +321,7 @@ export const Header = () => {
                   </div>
 
                   {/* Faculties */}
-                  <div className="col-span-4">
+                  <div>
                     <div className="border-l-4 border-gold pl-4 mb-4">
                       <h3 className="font-formal font-bold text-primary text-base">
                         {academicMegaMenuData.faculties.title}
@@ -338,7 +343,7 @@ export const Header = () => {
                   </div>
 
                   {/* Departments */}
-                  <div className="col-span-4">
+                  <div>
                     <div className="border-l-4 border-gold pl-4 mb-4">
                       <h3 className="font-formal font-bold text-primary text-base">
                         {academicMegaMenuData.departments.title}
