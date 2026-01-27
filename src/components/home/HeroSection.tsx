@@ -59,7 +59,8 @@ export const HeroSection = () => {
               transform: index === currentSlide ? 'scale(1.1)' : 'scale(1)'
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/60 via-primary/50 to-primary/70" />
+          {/* Subtle dark gradient overlay - keeps image visible */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50" />
         </div>
       ))}
 
@@ -71,7 +72,7 @@ export const HeroSection = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-primary/40 backdrop-blur-md rounded-2xl px-8 py-10 md:px-16 md:py-14 border border-white/10 shadow-2xl max-w-5xl mx-4"
+            className="bg-white/10 backdrop-blur-lg rounded-2xl px-8 py-10 md:px-16 md:py-14 border border-white/20 shadow-2xl max-w-5xl mx-4"
           >
             {/* Welcome Text - Smaller */}
             <motion.p
