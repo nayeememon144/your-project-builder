@@ -248,19 +248,19 @@ export const Header = () => {
                         exit={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.15 }}
                         className={cn(
-                          "absolute top-full bg-white rounded-b-lg shadow-xl min-w-56 z-50 overflow-hidden",
+                          "absolute top-full bg-white rounded-b-lg shadow-xl min-w-56 z-50",
                           // Position right-aligned dropdowns (About, Notices) to prevent overflow
                           item.label === 'About' || item.label === 'Notices' 
                             ? "right-0" 
                             : "left-0"
                         )}
                       >
-                        <div className="py-2">
+                        <div className="py-1">
                           {item.dropdown.map((subItem, idx) => (
                             <Link
                               key={idx}
                               to={subItem.href}
-                              className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                              className="flex items-center gap-2 px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
                             >
                               <ChevronRight className="w-3 h-3 text-gold" />
                               {subItem.label}
@@ -296,21 +296,21 @@ export const Header = () => {
               onMouseEnter={() => setActiveDropdown('Academics')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <div className="container mx-auto py-6 px-4">
-                <div className="grid grid-cols-3 gap-8 max-w-4xl">
+              <div className="container mx-auto py-4 px-4">
+                <div className="grid grid-cols-3 gap-6 max-w-4xl">
                   {/* Academic Information */}
                   <div>
-                    <div className="border-l-4 border-gold pl-4 mb-4">
-                      <h3 className="font-formal font-bold text-primary text-base">
+                    <div className="border-l-4 border-gold pl-3 mb-2">
+                      <h3 className="font-formal font-bold text-primary text-sm">
                         {academicMegaMenuData.academicInfo.title}
                       </h3>
                     </div>
-                    <ul className="space-y-1">
+                    <ul className="space-y-0.5">
                       {academicMegaMenuData.academicInfo.items.map((item, idx) => (
                         <li key={idx}>
                           <Link
                             to={item.href}
-                            className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-1"
+                            className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
                           >
                             <ChevronRight className="w-3 h-3 text-gray-400" />
                             {item.label}
@@ -322,17 +322,17 @@ export const Header = () => {
 
                   {/* Faculties */}
                   <div>
-                    <div className="border-l-4 border-gold pl-4 mb-4">
-                      <h3 className="font-formal font-bold text-primary text-base">
+                    <div className="border-l-4 border-gold pl-3 mb-2">
+                      <h3 className="font-formal font-bold text-primary text-sm">
                         {academicMegaMenuData.faculties.title}
                       </h3>
                     </div>
-                    <ul className="space-y-1">
+                    <ul className="space-y-0.5">
                       {academicMegaMenuData.faculties.items.map((item, idx) => (
                         <li key={idx}>
                           <Link
                             to={item.href}
-                            className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-1"
+                            className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
                           >
                             <ChevronRight className="w-3 h-3 text-gray-400" />
                             {item.label}
@@ -344,17 +344,17 @@ export const Header = () => {
 
                   {/* Departments */}
                   <div>
-                    <div className="border-l-4 border-gold pl-4 mb-4">
-                      <h3 className="font-formal font-bold text-primary text-base">
+                    <div className="border-l-4 border-gold pl-3 mb-2">
+                      <h3 className="font-formal font-bold text-primary text-sm">
                         {academicMegaMenuData.departments.title}
                       </h3>
                     </div>
-                    <ul className="space-y-1">
+                    <ul className="space-y-0.5">
                       {academicMegaMenuData.departments.items.map((item, idx) => (
                         <li key={idx}>
                           <Link
                             to={item.href}
-                            className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-1"
+                            className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-0.5"
                           >
                             <ChevronRight className="w-3 h-3 text-gray-400" />
                             {item.label}
