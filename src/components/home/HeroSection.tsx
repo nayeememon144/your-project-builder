@@ -4,7 +4,6 @@ import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 
-// Default hero slides (will be replaced by dynamic data)
 const defaultSlides = [
   {
     id: '1',
@@ -53,22 +52,25 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative h-[85vh] min-h-[600px] overflow-hidden">
-      {/* Background Slides */}
+    <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
+      {/* Background Slides with Zoom Animation */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
-          initial={{ opacity: 0, scale: 1.1 }}
-          animate={{ opacity: 1, scale: 1 }}
+          initial={{ scale: 1 }}
+          animate={{ scale: 1.1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ 
+            scale: { duration: 6, ease: "linear" },
+            opacity: { duration: 0.5 }
+          }}
           className="absolute inset-0"
         >
           <div 
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${slides[currentSlide].image_url})` }}
           />
-          <div className="absolute inset-0 hero-pattern opacity-90" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/60 to-primary/40" />
         </motion.div>
       </AnimatePresence>
 
@@ -81,7 +83,7 @@ export const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -30 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="max-w-3xl text-white"
+            className="max-w-2xl text-white"
           >
             <motion.div
               initial={{ width: 0 }}
@@ -90,17 +92,17 @@ export const HeroSection = () => {
               className="h-1 bg-gold mb-6"
             />
             
-            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
+            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
               {slides[currentSlide].title}
             </h1>
             
-            <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed max-w-2xl">
+            <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
               {slides[currentSlide].subtitle}
             </p>
             
             <div className="flex flex-wrap gap-4">
               <Link to={slides[currentSlide].cta_link}>
-                <Button className="btn-golden text-lg px-8 py-6 group">
+                <Button className="bg-gold text-primary hover:bg-gold/90 text-lg px-8 py-6 group font-semibold">
                   {slides[currentSlide].cta_text}
                   <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
@@ -135,14 +137,14 @@ export const HeroSection = () => {
       </button>
 
       {/* Slide Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
         {slides.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setCurrentSlide(idx)}
             className={`h-2 rounded-full transition-all duration-300 ${
               idx === currentSlide 
-                ? 'w-12 bg-gold' 
+                ? 'w-10 bg-gold' 
                 : 'w-2 bg-white/50 hover:bg-white'
             }`}
             aria-label={`Go to slide ${idx + 1}`}
