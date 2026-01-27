@@ -283,19 +283,19 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* Academic Mega Menu - Full Width */}
+        {/* Academic Mega Menu - Contained Panel */}
         <AnimatePresence>
           {activeDropdown === 'Academics' && (
             <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2 }}
-              className="absolute left-0 right-0 top-full bg-white shadow-2xl z-50 overflow-hidden"
+              className="absolute left-1/2 -translate-x-1/2 top-full bg-white shadow-2xl z-50 overflow-hidden rounded-b-lg border border-gray-200 max-w-5xl w-full"
               onMouseEnter={() => setActiveDropdown('Academics')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
-              <div className="container mx-auto py-8">
+              <div className="p-6">
                 <div className="grid grid-cols-12 gap-8">
                   {/* Academic Information */}
                   <div className="col-span-3">
