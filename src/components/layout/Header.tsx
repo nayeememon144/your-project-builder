@@ -258,15 +258,16 @@ export const Header = () => {
           </div>
         </div>
 
-        {/* Academic Mega Menu - Centered under navbar */}
+        {/* Academic Mega Menu - Positioned under Academics nav item */}
         <AnimatePresence>
           {activeDropdown === 'Academics' && (
             <motion.div
-              initial={{ opacity: 0, y: -10 }}
+              initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.2 }}
-              className="absolute left-0 right-0 top-full bg-white shadow-2xl z-50 overflow-hidden border-t-4 border-gold"
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.15 }}
+              className="absolute left-1/2 -translate-x-1/2 top-full bg-white rounded-b-lg shadow-xl z-50"
+              style={{ minWidth: '580px' }}
               onMouseEnter={() => setActiveDropdown('Academics')}
               onMouseLeave={() => setActiveDropdown(null)}
             >
