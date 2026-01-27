@@ -29,53 +29,23 @@ const academicMegaMenuData = {
     items: [
       { label: 'Academic Calendars', href: '/academic/calendar' },
       { label: 'Undergraduate Program', href: '/academic/undergraduate' },
-      { label: 'Postgraduate Program', href: '/academic/postgraduate' },
       { label: 'International Students', href: '/academic/international' },
     ]
   },
   faculties: {
     title: 'Faculties',
     items: [
-      { label: 'Faculty of Engineering', href: '/faculties/engineering' },
       { label: 'Faculty of Science', href: '/faculties/science' },
-      { label: 'Faculty of Arts & Social Science', href: '/faculties/arts' },
-      { label: 'Faculty of Business Studies', href: '/faculties/business' },
-      { label: 'Faculty of Law', href: '/faculties/law' },
-      { label: 'Faculty of Life Sciences', href: '/faculties/life-sciences' },
+      { label: 'Faculty of Engineering & Technology', href: '/faculties/engineering' },
     ]
   },
   departments: {
     title: 'Departments',
     items: [
       { label: 'Computer Science & Engineering', href: '/departments/cse' },
-      { label: 'Electrical & Electronic Engineering', href: '/departments/eee' },
-      { label: 'Civil Engineering', href: '/departments/ce' },
-      { label: 'Mechanical Engineering', href: '/departments/me' },
-      { label: 'Mathematics', href: '/departments/math' },
       { label: 'Physics', href: '/departments/physics' },
       { label: 'Chemistry', href: '/departments/chemistry' },
-      { label: 'English', href: '/departments/english' },
-      { label: 'Economics', href: '/departments/economics' },
-      { label: 'Accounting', href: '/departments/accounting' },
-      { label: 'Management', href: '/departments/management' },
-      { label: 'Statistics', href: '/departments/statistics' },
-    ]
-  },
-  institutes: {
-    title: 'Institutes',
-    items: [
-      { label: 'IEER', href: '/institutes/ieer' },
-      { label: 'IET', href: '/institutes/iet' },
-      { label: 'IICT', href: '/institutes/iict' },
-      { label: 'IRHES', href: '/institutes/irhes' },
-    ]
-  },
-  centers: {
-    title: 'Centers',
-    items: [
-      { label: 'Research Center', href: '/centers/research' },
-      { label: 'IT Center', href: '/centers/it' },
-      { label: 'Career Center', href: '/centers/career' },
+      { label: 'Mathematics', href: '/departments/math' },
     ]
   }
 };
@@ -299,7 +269,7 @@ export const Header = () => {
               <div className="p-6">
                 <div className="grid grid-cols-12 gap-6">
                   {/* Academic Information */}
-                  <div className="col-span-3">
+                  <div className="col-span-4">
                     <div className="border-l-4 border-gold pl-4 mb-4">
                       <h3 className="font-formal font-bold text-primary text-base">
                         {academicMegaMenuData.academicInfo.title}
@@ -321,89 +291,47 @@ export const Header = () => {
                   </div>
 
                   {/* Faculties */}
-                  <div className="col-span-5">
+                  <div className="col-span-4">
                     <div className="border-l-4 border-gold pl-4 mb-4">
                       <h3 className="font-formal font-bold text-primary text-base">
                         {academicMegaMenuData.faculties.title}
                       </h3>
                     </div>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                    <ul className="space-y-1">
                       {academicMegaMenuData.faculties.items.map((item, idx) => (
-                        <Link
-                          key={idx}
-                          to={item.href}
-                          className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-1"
-                        >
-                          <ChevronRight className="w-3 h-3 text-gray-400" />
-                          {item.label}
-                        </Link>
+                        <li key={idx}>
+                          <Link
+                            to={item.href}
+                            className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-1"
+                          >
+                            <ChevronRight className="w-3 h-3 text-gray-400" />
+                            {item.label}
+                          </Link>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
 
-                  {/* Institutes & Centers */}
+                  {/* Departments */}
                   <div className="col-span-4">
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      {/* Institutes */}
-                      <div className="mb-4">
-                        <h3 className="font-formal font-bold text-gray-800 mb-2 text-sm">
-                          {academicMegaMenuData.institutes.title}
-                        </h3>
-                        <ul className="space-y-1">
-                          {academicMegaMenuData.institutes.items.map((item, idx) => (
-                            <li key={idx}>
-                              <Link
-                                to={item.href}
-                                className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors"
-                              >
-                                <ChevronRight className="w-3 h-3 text-gray-400" />
-                                {item.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                      {/* Centers */}
-                      <div>
-                        <h3 className="font-formal font-bold text-gray-800 mb-2 text-sm">
-                          {academicMegaMenuData.centers.title}
-                        </h3>
-                        <ul className="space-y-1">
-                          {academicMegaMenuData.centers.items.map((item, idx) => (
-                            <li key={idx}>
-                              <Link
-                                to={item.href}
-                                className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors"
-                              >
-                                <ChevronRight className="w-3 h-3 text-gray-400" />
-                                {item.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                    <div className="border-l-4 border-gold pl-4 mb-4">
+                      <h3 className="font-formal font-bold text-primary text-base">
+                        {academicMegaMenuData.departments.title}
+                      </h3>
                     </div>
-                  </div>
-                </div>
-
-                {/* Departments Section - Bottom */}
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <div className="border-l-4 border-gold pl-4 mb-3">
-                    <h3 className="font-formal font-bold text-primary text-base">
-                      {academicMegaMenuData.departments.title}
-                    </h3>
-                  </div>
-                  <div className="grid grid-cols-4 gap-x-6 gap-y-1">
-                    {academicMegaMenuData.departments.items.map((item, idx) => (
-                      <Link
-                        key={idx}
-                        to={item.href}
-                        className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-1"
-                      >
-                        <ChevronRight className="w-3 h-3 text-gray-400" />
-                        {item.label}
-                      </Link>
-                    ))}
+                    <ul className="space-y-1">
+                      {academicMegaMenuData.departments.items.map((item, idx) => (
+                        <li key={idx}>
+                          <Link
+                            to={item.href}
+                            className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary transition-colors py-1"
+                          >
+                            <ChevronRight className="w-3 h-3 text-gray-400" />
+                            {item.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </div>

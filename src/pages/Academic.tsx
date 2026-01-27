@@ -11,12 +11,6 @@ const programs = [
     href: '/academic/undergraduate',
   },
   {
-    title: 'Postgraduate Programs',
-    description: 'Master and PhD programs for advanced studies',
-    icon: BookOpen,
-    href: '/academic/postgraduate',
-  },
-  {
     title: 'Academic Calendar',
     description: 'Important dates, schedules, and academic events',
     icon: Calendar,

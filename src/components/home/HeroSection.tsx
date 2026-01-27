@@ -96,11 +96,9 @@ export const HeroSection = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
-              className="font-formal text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-wide"
+              className="font-formal text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-wide text-center"
             >
-              <span className="text-gold">Sunamgonj</span> Science and
-              <br />
-              Technology University
+              Sunamgonj Science and Technology University
             </motion.h1>
           </motion.div>
         </div>
