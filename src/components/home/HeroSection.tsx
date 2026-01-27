@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import campus1 from '@/assets/campus/campus-1.jpg';
 import campus2 from '@/assets/campus/campus-2.jpg';
 import campus3 from '@/assets/campus/campus-3.jpg';
@@ -113,7 +113,7 @@ export const HeroSection = () => {
       </button>
 
       {/* Slide Indicators */}
-      <div className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 flex gap-3">
+      <div className="absolute z-20 bottom-20 left-1/2 -translate-x-1/2 flex gap-3">
         {slides.map((_, idx) => (
           <button
             key={idx}
@@ -127,6 +127,24 @@ export const HeroSection = () => {
           />
         ))}
       </div>
+
+      {/* Scroll Down Indicator */}
+      <motion.button
+        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+        className="absolute z-20 bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors cursor-pointer"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1, duration: 0.5 }}
+        aria-label="Scroll down"
+      >
+        <span className="text-xs uppercase tracking-widest">Scroll</span>
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <ChevronDown className="w-6 h-6" />
+        </motion.div>
+      </motion.button>
     </section>
   );
 };
