@@ -12,7 +12,8 @@ import {
   Search,
   Eye,
   Calendar,
-  Image
+  Image,
+  Upload
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -52,6 +53,7 @@ const NewsManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingNews, setEditingNews] = useState<News | null>(null);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     title_bn: '',
@@ -89,6 +91,37 @@ const NewsManagement = () => {
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `news-${Date.now()}.${fileExt}`;
+    const filePath = `news/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('attachments')
+      .upload(filePath, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase.storage.from('attachments').getPublicUrl(filePath);
+    return data.publicUrl;
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const url = await uploadImage(file);
+      setFormData({ ...formData, featured_image: url });
+      toast.success('Image uploaded successfully');
+    } catch (error: any) {
+      toast.error('Failed to upload image: ' + error.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -329,12 +362,27 @@ const NewsManagement = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="featured_image">Featured Image URL</Label>
+                  <Label>Featured Image</Label>
+                  <div className="flex items-center gap-4">
+                    <Input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                    />
+                    {uploading && <span className="text-sm text-muted-foreground">Uploading...</span>}
+                  </div>
+                  {formData.featured_image && (
+                    <div className="mt-2">
+                      <img src={formData.featured_image} alt="Preview" className="w-full max-w-md h-32 object-cover rounded-lg" />
+                    </div>
+                  )}
                   <Input
                     id="featured_image"
                     value={formData.featured_image}
                     onChange={(e) => setFormData({ ...formData, featured_image: e.target.value })}
-                    placeholder="https://..."
+                    placeholder="Or paste image URL directly..."
+                    className="mt-2"
                   />
                 </div>
 

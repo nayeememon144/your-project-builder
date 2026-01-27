@@ -36,8 +36,18 @@ const menuItems = [
     icon: LayoutDashboard 
   },
   { 
+    title: 'Hero Slides', 
+    href: '/admin/hero-slides', 
+    icon: Image 
+  },
+  { 
     title: 'Notices', 
     href: '/admin/notices', 
+    icon: Bell 
+  },
+  { 
+    title: 'Notice Categories', 
+    href: '/admin/notice-categories', 
     icon: Bell 
   },
   { 
