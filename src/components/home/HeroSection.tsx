@@ -1,33 +1,20 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import sstuLogo from '@/assets/sstu-logo.png';
 
 const defaultSlides = [
   {
     id: '1',
-    title: 'Welcome to SSTU',
-    subtitle: 'Empowering Minds, Shaping Futures - A premier institution of higher learning dedicated to academic excellence and innovation.',
     image_url: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1920&q=80',
-    cta_text: 'Explore Programs',
-    cta_link: '/academic',
   },
   {
     id: '2',
-    title: 'World-Class Research',
-    subtitle: 'Join our faculty of distinguished researchers pushing the boundaries of knowledge across diverse fields.',
     image_url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80',
-    cta_text: 'View Research',
-    cta_link: '/research',
   },
   {
     id: '3',
-    title: 'Admission Open 2025',
-    subtitle: 'Begin your journey towards excellence. Apply now for undergraduate and postgraduate programs.',
     image_url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=1920&q=80',
-    cta_text: 'Apply Now',
-    cta_link: '/admission',
   },
 ];
 
@@ -52,17 +39,17 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative h-[70vh] min-h-[500px] overflow-hidden">
+    <section className="relative h-[80vh] min-h-[600px] overflow-hidden">
       {/* Background Slides with Zoom Animation */}
       <AnimatePresence mode="wait">
         <motion.div
           key={currentSlide}
-          initial={{ scale: 1 }}
-          animate={{ scale: 1.1 }}
+          initial={{ scale: 1.05, opacity: 0 }}
+          animate={{ scale: 1.15, opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ 
             scale: { duration: 6, ease: "linear" },
-            opacity: { duration: 0.5 }
+            opacity: { duration: 0.8 }
           }}
           className="absolute inset-0"
         >
@@ -70,54 +57,67 @@ export const HeroSection = () => {
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${slides[currentSlide].image_url})` }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/60 to-primary/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/70 via-primary/60 to-primary/80" />
         </motion.div>
       </AnimatePresence>
 
-      {/* Content */}
-      <div className="relative h-full container mx-auto flex items-center">
-        <AnimatePresence mode="wait">
+      {/* Fixed Content Card - Does NOT animate with slides */}
+      <div className="relative h-full container mx-auto flex items-center justify-center">
+        <div className="text-center">
+          {/* Logo */}
           <motion.div
-            key={currentSlide}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -30 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="max-w-2xl text-white"
+            transition={{ duration: 0.6 }}
+            className="flex justify-center mb-6"
           >
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: '80px' }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="h-1 bg-gold mb-6"
+            <img 
+              src={sstuLogo} 
+              alt="SSTU Logo" 
+              className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-lg"
             />
-            
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-              {slides[currentSlide].title}
-            </h1>
-            
-            <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
-              {slides[currentSlide].subtitle}
-            </p>
-            
-            <div className="flex flex-wrap gap-4">
-              <Link to={slides[currentSlide].cta_link}>
-                <Button className="bg-gold text-primary hover:bg-gold/90 text-lg px-8 py-6 group font-semibold">
-                  {slides[currentSlide].cta_text}
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link to="/about">
-                <Button 
-                  variant="outline" 
-                  className="text-lg px-8 py-6 border-white/50 text-white bg-white/10 hover:bg-white hover:text-primary backdrop-blur-sm"
-                >
-                  Learn More
-                </Button>
-              </Link>
-            </div>
           </motion.div>
-        </AnimatePresence>
+
+          {/* Glass Card with University Name */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="bg-primary/40 backdrop-blur-md rounded-2xl px-8 py-10 md:px-16 md:py-12 border border-white/10 shadow-2xl max-w-4xl mx-4"
+          >
+            {/* Welcome Text */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="text-gold font-semibold tracking-[0.3em] uppercase text-sm md:text-base mb-4"
+            >
+              Welcome To
+            </motion.p>
+
+            {/* University Name */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="font-display text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight"
+            >
+              Sunamgonj Science and
+              <br />
+              Technology University
+            </motion.h1>
+
+            {/* Bengali Name */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="bengali text-white/80 text-lg md:text-xl mt-4"
+            >
+              সুনামগঞ্জ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়
+            </motion.p>
+          </motion.div>
+        </div>
       </div>
 
       {/* Navigation Arrows */}
@@ -137,7 +137,7 @@ export const HeroSection = () => {
       </button>
 
       {/* Slide Indicators */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3">
         {slides.map((_, idx) => (
           <button
             key={idx}
