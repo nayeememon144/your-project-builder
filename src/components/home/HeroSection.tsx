@@ -52,21 +52,13 @@ export const HeroSection = () => {
             zIndex: index === currentSlide ? 1 : 0
           }}
         >
-          <motion.div
-            className="absolute inset-0"
-            animate={{ 
-              scale: index === currentSlide ? 1.1 : 1 
+          <div 
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-[6000ms] ease-linear"
+            style={{ 
+              backgroundImage: `url(${slide.image_url})`,
+              transform: index === currentSlide ? 'scale(1.1)' : 'scale(1)'
             }}
-            transition={{ 
-              duration: 6, 
-              ease: "linear" 
-            }}
-          >
-            <div 
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${slide.image_url})` }}
-            />
-          </motion.div>
+          />
           <div className="absolute inset-0 bg-gradient-to-b from-primary/60 via-primary/50 to-primary/70" />
         </div>
       ))}
