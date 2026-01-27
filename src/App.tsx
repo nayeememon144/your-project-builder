@@ -19,6 +19,9 @@ import AdminEvents from "./pages/admin/EventsManagement";
 import AdminQuickStats from "./pages/admin/QuickStatsManagement";
 import AdminPrograms from "./pages/admin/ProgramsManagement";
 import AdminSiteSettings from "./pages/admin/SiteSettingsManagement";
+import AdminFacilities from "./pages/admin/FacilitiesManagement";
+import AdminStudents from "./pages/admin/StudentsManagement";
+import AdminResearch from "./pages/admin/ResearchManagement";
 import TeacherLogin from "./pages/teacher/Login";
 import TeacherRegister from "./pages/teacher/Register";
 import TeacherDashboard from "./pages/teacher/Dashboard";
@@ -175,6 +178,30 @@ const App = () => (
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminSiteSettings />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/facilities" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminFacilities />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/students" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminStudents />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/research" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminResearch />
               </ProtectedRoute>
             } 
           />

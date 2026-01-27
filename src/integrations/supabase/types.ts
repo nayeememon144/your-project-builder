@@ -148,6 +148,66 @@ export type Database = {
         }
         Relationships: []
       }
+      facilities: {
+        Row: {
+          category: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          description_bn: string | null
+          display_order: number | null
+          featured_image: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          location: string | null
+          name: string
+          name_bn: string | null
+          operating_hours: string | null
+          short_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          description_bn?: string | null
+          display_order?: number | null
+          featured_image?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          name: string
+          name_bn?: string | null
+          operating_hours?: string | null
+          short_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          description_bn?: string | null
+          display_order?: number | null
+          featured_image?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          name?: string
+          name_bn?: string | null
+          operating_hours?: string | null
+          short_name?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       faculties: {
         Row: {
           created_at: string

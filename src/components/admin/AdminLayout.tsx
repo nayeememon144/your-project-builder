@@ -81,6 +81,11 @@ const menuItems = [
     icon: GraduationCap 
   },
   { 
+    title: 'Facilities', 
+    href: '/admin/facilities', 
+    icon: Building2 
+  },
+  { 
     title: 'Teachers', 
     href: '/admin/teachers', 
     icon: Users 
@@ -89,6 +94,11 @@ const menuItems = [
     title: 'Students', 
     href: '/admin/students', 
     icon: GraduationCap 
+  },
+  { 
+    title: 'Research Papers', 
+    href: '/admin/research', 
+    icon: FileText 
   },
   { 
     title: 'Gallery', 
