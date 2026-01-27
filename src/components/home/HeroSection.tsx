@@ -72,10 +72,8 @@ export const HeroSection = () => {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="relative bg-white/10 backdrop-blur-lg rounded-2xl px-8 py-10 md:px-16 md:py-14 border border-white/20 shadow-[0_0_60px_rgba(255,255,255,0.15),0_0_100px_rgba(34,139,87,0.2)] max-w-5xl mx-4 overflow-hidden"
+            className="bg-white/10 backdrop-blur-lg rounded-2xl px-8 py-10 md:px-16 md:py-14 border border-white/20 shadow-[0_0_60px_rgba(255,255,255,0.15),0_0_100px_rgba(34,139,87,0.2)] max-w-5xl mx-4"
           >
-            {/* Green accent line at bottom */}
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-primary to-accent" />
             {/* Welcome Text - Smaller */}
             <motion.p
               initial={{ opacity: 0 }}
