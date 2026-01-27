@@ -15,6 +15,7 @@ export default {
     extend: {
       fontFamily: {
         display: ['Playfair Display', 'Georgia', 'serif'],
+        formal: ['Merriweather', 'Georgia', 'serif'],
         body: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         bengali: ['Noto Sans Bengali', 'sans-serif'],
       },
