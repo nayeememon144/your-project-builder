@@ -15,7 +15,6 @@ import sstuLogo from '@/assets/sstu-logo.png';
 const academicsLinks = [
   { label: 'All Departments', href: '/departments' },
   { label: 'Undergraduate', href: '/academic/undergraduate' },
-  { label: 'Postgraduate', href: '/academic/postgraduate' },
   { label: 'Academic Calendar', href: '/academic/calendar' },
   { label: 'E-Resources', href: '/facilities/e-resources' },
   { label: 'Scholarships', href: '/facilities/scholarship' },
@@ -171,17 +170,17 @@ export const Footer = () => {
                 </div>
               </div>
 
-              {/* Map */}
+              {/* Map - SSTU Location */}
               <div className="bg-primary-foreground/10 rounded-lg overflow-hidden h-48">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3619.0!2d91.4!3d24.4!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjTCsDI0JzAwLjAiTiA5McKwMjQnMDAuMCJF!5e0!3m2!1sen!2sbd!4v1234567890"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d57897.94282752866!2d91.35!3d24.87!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x375158e5c7376bcb%3A0x3c2e8a31e5a2e2fa!2sSunamganj!5e0!3m2!1sen!2sbd!4v1706370000000!5m2!1sen!2sbd"
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
                   allowFullScreen
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
-                  title="SSTU Location"
+                  title="SSTU Location - Shantiganj, Sunamganj"
                   className="grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-300"
                 />
               </div>
