@@ -41,6 +41,11 @@ const menuItems = [
     icon: Image 
   },
   { 
+    title: 'Quick Stats', 
+    href: '/admin/quick-stats', 
+    icon: Building2 
+  },
+  { 
     title: 'Notices', 
     href: '/admin/notices', 
     icon: Bell 
@@ -56,6 +61,11 @@ const menuItems = [
     icon: FileText 
   },
   { 
+    title: 'Events', 
+    href: '/admin/events', 
+    icon: Bell 
+  },
+  { 
     title: 'Faculties', 
     href: '/admin/faculties', 
     icon: Building2 
@@ -64,6 +74,11 @@ const menuItems = [
     title: 'Departments', 
     href: '/admin/departments', 
     icon: Building2 
+  },
+  { 
+    title: 'Programs', 
+    href: '/admin/programs', 
+    icon: GraduationCap 
   },
   { 
     title: 'Teachers', 
@@ -81,7 +96,7 @@ const menuItems = [
     icon: Image 
   },
   { 
-    title: 'Settings', 
+    title: 'Site Settings', 
     href: '/admin/settings', 
     icon: Settings 
   },
