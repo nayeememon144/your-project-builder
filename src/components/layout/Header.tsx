@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Menu, 
@@ -118,11 +118,30 @@ export const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [portalMenuOpen, setPortalMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Determine if navbar should be transparent (only on homepage and not scrolled)
+  const isTransparent = isHomePage && !isScrolled;
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50">
-      {/* Top Bar */}
-      <div className="bg-primary text-primary-foreground py-2 hidden lg:block">
+    <header className={cn(
+      "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+      isTransparent ? "bg-transparent" : "bg-primary shadow-lg"
+    )}>
+      {/* Top Bar - Only show when scrolled or not on homepage */}
+      {!isTransparent && (
+        <div className="bg-primary text-primary-foreground py-2 hidden lg:block">
         <div className="container mx-auto flex justify-between items-center text-sm">
           <div className="flex items-center gap-6">
             {topBarLinks.map((link, idx) => (
@@ -171,10 +190,16 @@ export const Header = () => {
             </div>
           </div>
         </div>
-      </div>
+        </div>
+      )}
 
       {/* Main Navigation */}
-      <nav className="bg-primary border-b border-primary/20">
+      <nav className={cn(
+        "border-b transition-all duration-300",
+        isTransparent 
+          ? "bg-black/20 backdrop-blur-sm border-white/10" 
+          : "bg-primary border-primary/20"
+      )}>
         <div className="container mx-auto">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
