@@ -1,6 +1,4 @@
 import { ReactNode } from 'react';
-import { Footer } from './Footer';
-import { BackToTopButton } from '@/components/ui/BackToTopButton';
 
 interface PortalLayoutProps {
   children: ReactNode;
@@ -12,8 +10,6 @@ export const PortalLayout = ({ children }: PortalLayoutProps) => {
       <main className="flex-1">
         {children}
       </main>
-      <Footer />
-      <BackToTopButton />
     </div>
   );
 };
