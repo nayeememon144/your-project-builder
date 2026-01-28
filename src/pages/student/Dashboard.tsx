@@ -3,8 +3,7 @@ import { Link } from 'react-router-dom';
 import { 
   User, 
   BookOpen, 
-  Settings, 
-  LogOut,
+  Settings,
   Calendar,
   GraduationCap,
   CreditCard
@@ -41,8 +40,8 @@ const StudentDashboard = () => {
   ];
 
   return (
-    <PortalLayout>
-      <div className="bg-muted/30 min-h-screen py-8">
+    <PortalLayout portalName="Student Portal" loginPath="/student/login">
+      <div className="min-h-screen py-8">
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -55,12 +54,6 @@ const StudentDashboard = () => {
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
               </Button>
-              <Link to="/student/login">
-                <Button variant="ghost" size="sm">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </Button>
-              </Link>
             </div>
           </div>
 

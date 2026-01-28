@@ -1,15 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { 
   User, 
   BookOpen, 
   FileText, 
   Bell, 
-  Settings, 
-  LogOut,
+  Settings,
   Plus,
   Search,
-  Calendar,
   Award,
   TrendingUp
 } from 'lucide-react';
@@ -57,8 +54,8 @@ const TeacherDashboard = () => {
   ];
 
   return (
-    <PortalLayout>
-      <div className="bg-muted/30 min-h-screen py-8">
+    <PortalLayout portalName="Teacher Portal" loginPath="/teacher/login">
+      <div className="min-h-screen py-8">
         <div className="container mx-auto px-4">
           {/* Header */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -71,12 +68,6 @@ const TeacherDashboard = () => {
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
               </Button>
-              <Link to="/teacher/login">
-                <Button variant="ghost" size="sm">
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
-                </Button>
-              </Link>
             </div>
           </div>
 
