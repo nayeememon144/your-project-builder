@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { 
   User, 
   BookOpen, 
+  Settings, 
+  LogOut,
   Calendar,
   GraduationCap,
   CreditCard
@@ -43,9 +45,23 @@ const StudentDashboard = () => {
       <div className="bg-muted/30 min-h-screen py-8">
         <div className="container mx-auto px-4">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="font-display text-3xl font-bold">Student Dashboard</h1>
-            <p className="text-muted-foreground">Welcome back, Md. Abdul Karim</p>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+            <div>
+              <h1 className="font-display text-3xl font-bold">Student Dashboard</h1>
+              <p className="text-muted-foreground">Welcome back, Md. Abdul Karim</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Button variant="outline" size="sm">
+                <Settings className="w-4 h-4 mr-2" />
+                Settings
+              </Button>
+              <Link to="/student/login">
+                <Button variant="ghost" size="sm">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </Link>
+            </div>
           </div>
 
           {/* Stats Grid */}
