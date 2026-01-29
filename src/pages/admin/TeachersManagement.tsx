@@ -766,6 +766,17 @@ const TeachersManagement = () => {
                             Unverify
                           </Button>
                         )}
+                        <Button 
+                          size="sm" 
+                          variant="destructive"
+                          onClick={() => {
+                            setSelectedTeacher(teacher);
+                            setIsRemoveDialogOpen(true);
+                          }}
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Delete
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>

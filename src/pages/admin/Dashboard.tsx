@@ -38,31 +38,58 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      // Fetch all counts in parallel
+      // Fetch basic counts
       const [
         { count: noticeCount },
         { count: deptCount },
         { count: facultyCount },
-        { count: studentCount },
-        { count: teacherCount },
       ] = await Promise.all([
         supabase.from('notices').select('*', { count: 'exact', head: true }),
         supabase.from('departments').select('*', { count: 'exact', head: true }).eq('is_active', true),
         supabase.from('faculties').select('*', { count: 'exact', head: true }).eq('is_active', true),
-        supabase.from('profiles').select('*, user_roles!inner(role)', { count: 'exact', head: true })
-          .eq('user_roles.role', 'student')
-          .eq('is_active', true),
-        supabase.from('profiles').select('*, user_roles!inner(role)', { count: 'exact', head: true })
-          .eq('user_roles.role', 'teacher')
-          .eq('is_active', true),
       ]);
+
+      // Fetch user counts by role (two-step query to avoid join issues)
+      const { data: studentRoles } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'student');
+      
+      const { data: teacherRoles } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'teacher');
+
+      // Count active profiles for each role
+      let studentCount = 0;
+      let teacherCount = 0;
+
+      if (studentRoles && studentRoles.length > 0) {
+        const studentUserIds = studentRoles.map(r => r.user_id);
+        const { count } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .in('user_id', studentUserIds)
+          .eq('is_active', true);
+        studentCount = count || 0;
+      }
+
+      if (teacherRoles && teacherRoles.length > 0) {
+        const teacherUserIds = teacherRoles.map(r => r.user_id);
+        const { count } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .in('user_id', teacherUserIds)
+          .eq('is_active', true);
+        teacherCount = count || 0;
+      }
 
       setStats({
         totalNotices: noticeCount || 0,
         totalDepartments: deptCount || 0,
         totalFaculties: facultyCount || 0,
-        totalStudents: studentCount || 0,
-        totalTeachers: teacherCount || 0,
+        totalStudents: studentCount,
+        totalTeachers: teacherCount,
       });
     };
 
