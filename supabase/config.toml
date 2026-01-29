@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.add-teacher]
 verify_jwt = false
+
+[functions.update-teacher]
+verify_jwt = false
+
+[functions.remove-teacher]
+verify_jwt = false
