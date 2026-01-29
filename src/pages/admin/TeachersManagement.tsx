@@ -8,13 +8,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Search, UserCheck, UserX, Eye, Plus, CheckCircle, Clock, ExternalLink, Loader2, Upload, Pencil, Trash2 } from 'lucide-react';
+import { Search, UserCheck, UserX, Eye, Plus, CheckCircle, Clock, ExternalLink, Loader2, Upload, Pencil, Trash2, Download, Key, Users } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 
@@ -59,9 +60,12 @@ const TeachersManagement = () => {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [uploadingEditPhoto, setUploadingEditPhoto] = useState(false);
+  const [selectedTeachers, setSelectedTeachers] = useState<Set<string>>(new Set());
+  const [newPassword, setNewPassword] = useState('');
   const photoInputRef = useRef<HTMLInputElement>(null);
   const editPhotoInputRef = useRef<HTMLInputElement>(null);
 
@@ -261,6 +265,32 @@ const TeachersManagement = () => {
     },
   });
 
+  // Reset password mutation
+  const resetPasswordMutation = useMutation({
+    mutationFn: async ({ user_id, new_password }: { user_id: string; new_password: string }) => {
+      const { data: result, error } = await supabase.functions.invoke('reset-teacher-password', {
+        body: { user_id, new_password }
+      });
+
+      if (error) throw error;
+      if (!result.success) throw new Error(result.error);
+
+      return result;
+    },
+    onSuccess: () => {
+      setIsResetPasswordOpen(false);
+      setNewPassword('');
+      toast({ title: 'Password reset successfully! Teacher can now login with the new password.' });
+    },
+    onError: (error: Error) => {
+      toast({ 
+        title: 'Failed to reset password', 
+        description: error.message,
+        variant: 'destructive' 
+      });
+    },
+  });
+
   // Verify/Unverify teacher
   const verifyMutation = useMutation({
     mutationFn: async ({ id, verified }: { id: string; verified: boolean }) => {
@@ -294,6 +324,44 @@ const TeachersManagement = () => {
     },
     onError: () => {
       toast({ title: 'Failed to update status', variant: 'destructive' });
+    },
+  });
+
+  // Bulk verify mutation
+  const bulkVerifyMutation = useMutation({
+    mutationFn: async ({ ids, verified }: { ids: string[]; verified: boolean }) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_verified: verified })
+        .in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: (_, { verified }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-teachers'] });
+      setSelectedTeachers(new Set());
+      toast({ title: verified ? 'Selected teachers verified' : 'Selected teachers unverified' });
+    },
+    onError: () => {
+      toast({ title: 'Failed to update teachers', variant: 'destructive' });
+    },
+  });
+
+  // Bulk activate/deactivate mutation
+  const bulkActivateMutation = useMutation({
+    mutationFn: async ({ ids, active }: { ids: string[]; active: boolean }) => {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: active })
+        .in('id', ids);
+      if (error) throw error;
+    },
+    onSuccess: (_, { active }) => {
+      queryClient.invalidateQueries({ queryKey: ['admin-teachers'] });
+      setSelectedTeachers(new Set());
+      toast({ title: active ? 'Selected teachers activated' : 'Selected teachers deactivated' });
+    },
+    onError: () => {
+      toast({ title: 'Failed to update teachers', variant: 'destructive' });
     },
   });
 
@@ -396,6 +464,19 @@ const TeachersManagement = () => {
     updateTeacherMutation.mutate({ user_id: selectedTeacher.user_id, ...editTeacher });
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTeacher || !newPassword) {
+      toast({ title: 'Please enter a new password', variant: 'destructive' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast({ title: 'Password must be at least 6 characters', variant: 'destructive' });
+      return;
+    }
+    resetPasswordMutation.mutate({ user_id: selectedTeacher.user_id, new_password: newPassword });
+  };
+
   const openEditDialog = (teacher: TeacherProfile) => {
     setSelectedTeacher(teacher);
     setEditTeacher({
@@ -436,6 +517,58 @@ const TeachersManagement = () => {
     setIsDetailOpen(true);
   };
 
+  const toggleTeacherSelection = (teacherId: string) => {
+    const newSelection = new Set(selectedTeachers);
+    if (newSelection.has(teacherId)) {
+      newSelection.delete(teacherId);
+    } else {
+      newSelection.add(teacherId);
+    }
+    setSelectedTeachers(newSelection);
+  };
+
+  const toggleAllTeachers = () => {
+    if (!filteredTeachers) return;
+    if (selectedTeachers.size === filteredTeachers.length) {
+      setSelectedTeachers(new Set());
+    } else {
+      setSelectedTeachers(new Set(filteredTeachers.map(t => t.id)));
+    }
+  };
+
+  const exportToCSV = () => {
+    if (!teachers || teachers.length === 0) {
+      toast({ title: 'No teachers to export', variant: 'destructive' });
+      return;
+    }
+
+    const headers = ['Full Name', 'Email', 'Phone', 'Designation', 'Employee ID', 'Department', 'Status', 'Verified', 'Joined Date'];
+    const rows = teachers.map(teacher => [
+      teacher.full_name,
+      teacher.email || '',
+      teacher.phone || '',
+      teacher.designation || '',
+      teacher.employee_id || '',
+      getDepartmentName(teacher.department_id),
+      teacher.is_active ? 'Active' : 'Inactive',
+      teacher.is_verified ? 'Yes' : 'No',
+      format(new Date(teacher.created_at), 'yyyy-MM-dd')
+    ]);
+
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `teachers_export_${format(new Date(), 'yyyy-MM-dd')}.csv`;
+    link.click();
+    
+    toast({ title: 'Export completed', description: `${teachers.length} teachers exported to CSV` });
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -444,10 +577,16 @@ const TeachersManagement = () => {
             <h1 className="text-3xl font-bold">Teachers Management</h1>
             <p className="text-muted-foreground">Add, view, verify, and manage teacher profiles and publications</p>
           </div>
-          <Button onClick={() => setIsAddOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Teacher
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={exportToCSV}>
+              <Download className="w-4 h-4 mr-2" />
+              Export CSV
+            </Button>
+            <Button onClick={() => setIsAddOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Teacher
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
@@ -475,6 +614,56 @@ const TeachersManagement = () => {
           </Select>
         </div>
 
+        {/* Bulk Actions Bar */}
+        {selectedTeachers.size > 0 && (
+          <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
+            <Users className="w-5 h-5 text-muted-foreground" />
+            <span className="font-medium">{selectedTeachers.size} teacher(s) selected</span>
+            <div className="flex-1" />
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => bulkVerifyMutation.mutate({ ids: Array.from(selectedTeachers), verified: true })}
+              disabled={bulkVerifyMutation.isPending}
+            >
+              <UserCheck className="w-4 h-4 mr-1" />
+              Verify All
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => bulkVerifyMutation.mutate({ ids: Array.from(selectedTeachers), verified: false })}
+              disabled={bulkVerifyMutation.isPending}
+            >
+              <UserX className="w-4 h-4 mr-1" />
+              Unverify All
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => bulkActivateMutation.mutate({ ids: Array.from(selectedTeachers), active: true })}
+              disabled={bulkActivateMutation.isPending}
+            >
+              Activate All
+            </Button>
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => bulkActivateMutation.mutate({ ids: Array.from(selectedTeachers), active: false })}
+              disabled={bulkActivateMutation.isPending}
+            >
+              Deactivate All
+            </Button>
+            <Button 
+              size="sm" 
+              variant="ghost"
+              onClick={() => setSelectedTeachers(new Set())}
+            >
+              Clear Selection
+            </Button>
+          </div>
+        )}
+
         {/* Teachers Table */}
         {teachersLoading ? (
           <div className="space-y-4">
@@ -487,6 +676,12 @@ const TeachersManagement = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead className="w-12">
+                    <Checkbox 
+                      checked={filteredTeachers.length > 0 && selectedTeachers.size === filteredTeachers.length}
+                      onCheckedChange={toggleAllTeachers}
+                    />
+                  </TableHead>
                   <TableHead>Teacher</TableHead>
                   <TableHead>Department</TableHead>
                   <TableHead>Designation</TableHead>
@@ -498,6 +693,12 @@ const TeachersManagement = () => {
               <TableBody>
                 {filteredTeachers.map((teacher) => (
                   <TableRow key={teacher.id}>
+                    <TableCell>
+                      <Checkbox 
+                        checked={selectedTeachers.has(teacher.id)}
+                        onCheckedChange={() => toggleTeacherSelection(teacher.id)}
+                      />
+                    </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
@@ -923,6 +1124,49 @@ const TeachersManagement = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Reset Password Dialog */}
+        <Dialog open={isResetPasswordOpen} onOpenChange={setIsResetPasswordOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Reset Password</DialogTitle>
+            </DialogHeader>
+            
+            <form onSubmit={handleResetPassword} className="space-y-4 mt-4">
+              <p className="text-sm text-muted-foreground">
+                Reset password for <strong>{selectedTeacher?.full_name}</strong>
+              </p>
+              
+              <div className="space-y-2">
+                <Label htmlFor="new_password">New Password *</Label>
+                <Input
+                  id="new_password"
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Min 6 characters"
+                  required
+                />
+                <p className="text-xs text-muted-foreground">
+                  The teacher will need to use this new password to log in.
+                </p>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button type="button" variant="outline" onClick={() => {
+                  setIsResetPasswordOpen(false);
+                  setNewPassword('');
+                }} className="flex-1">
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={resetPasswordMutation.isPending} className="flex-1">
+                  {resetPasswordMutation.isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                  Reset Password
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
         {/* Teacher Detail Dialog */}
         <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -1121,6 +1365,25 @@ const TeachersManagement = () => {
                       }
                       disabled={verifyMutation.isPending}
                     />
+                  </div>
+
+                  {/* Password Reset Section */}
+                  <div className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium">Reset Password</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Set a new password for this teacher
+                        </p>
+                      </div>
+                      <Button 
+                        variant="outline"
+                        onClick={() => setIsResetPasswordOpen(true)}
+                      >
+                        <Key className="w-4 h-4 mr-2" />
+                        Reset Password
+                      </Button>
+                    </div>
                   </div>
 
                   {/* Danger Zone */}
