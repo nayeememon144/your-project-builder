@@ -74,17 +74,26 @@ const TeachersManagement = () => {
     profile_photo: '',
   });
 
-  // Fetch teachers with their role
+  // Fetch teachers with their role (two-step query since no FK between profiles and user_roles)
   const { data: teachers, isLoading: teachersLoading } = useQuery({
     queryKey: ['admin-teachers'],
     queryFn: async () => {
+      // First get all teacher user_ids
+      const { data: teacherRoles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id')
+        .eq('role', 'teacher');
+      
+      if (rolesError) throw rolesError;
+      if (!teacherRoles || teacherRoles.length === 0) return [];
+      
+      const teacherUserIds = teacherRoles.map(r => r.user_id);
+      
+      // Then fetch profiles for those users
       const { data, error } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          user_roles!inner(role)
-        `)
-        .eq('user_roles.role', 'teacher')
+        .select('*')
+        .in('user_id', teacherUserIds)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
