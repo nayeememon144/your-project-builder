@@ -121,29 +121,14 @@ const TeachersManagement = () => {
     enabled: !!selectedTeacher,
   });
 
-  // Add new teacher mutation
+  // Add new teacher mutation using edge function
   const addTeacherMutation = useMutation({
     mutationFn: async (data: typeof newTeacher) => {
-      // Create auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: data.password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/teacher/login`,
-          data: {
-            full_name: data.full_name,
-            role: 'teacher',
-          },
-        },
-      });
-
-      if (authError) throw authError;
-      if (!authData.user) throw new Error('Failed to create user');
-
-      // Update profile with additional info
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
+      const { data: result, error } = await supabase.functions.invoke('add-teacher', {
+        body: {
+          email: data.email,
+          password: data.password,
+          full_name: data.full_name,
           phone: data.phone || null,
           designation: data.designation || null,
           employee_id: data.employee_id || null,
@@ -151,14 +136,13 @@ const TeachersManagement = () => {
           academic_background: data.academic_background || null,
           professional_experience: data.professional_experience || null,
           profile_photo: data.profile_photo || null,
-          is_active: true,
-          is_verified: true,
-        })
-        .eq('user_id', authData.user.id);
+        }
+      });
 
-      if (profileError) throw profileError;
+      if (error) throw error;
+      if (!result.success) throw new Error(result.error);
 
-      return authData.user;
+      return result.user;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-teachers'] });

@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.seed-teachers]
 verify_jwt = false
+
+[functions.add-teacher]
+verify_jwt = false
