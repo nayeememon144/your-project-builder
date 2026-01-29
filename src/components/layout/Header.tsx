@@ -248,7 +248,7 @@ export const Header = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute left-1/2 -translate-x-1/2 top-full bg-white rounded-lg shadow-2xl z-50 border-t-4 border-gold"
+                        className="absolute left-0 top-full bg-white rounded-lg shadow-2xl z-50 border-t-4 border-gold"
                       >
                         <AcademicMegaMenu />
                       </motion.div>
