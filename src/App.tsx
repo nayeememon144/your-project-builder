@@ -40,6 +40,7 @@ import Departments from "./pages/Departments";
 import Faculties from "./pages/Faculties";
 import Contact from "./pages/Contact";
 import Gallery from "./pages/Gallery";
+import ProgramDetail from "./pages/ProgramDetail";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -68,6 +69,7 @@ const App = () => (
           <Route path="/faculties/*" element={<Faculties />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/gallery" element={<Gallery />} />
+          <Route path="/programs/:id" element={<ProgramDetail />} />
           <Route path="/events" element={<NoticesPage />} />
           <Route path="/downloads" element={<NoticesPage />} />
           <Route path="/faq" element={<About />} />
