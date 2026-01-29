@@ -1,15 +1,19 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Link } from 'react-router-dom';
-import { GraduationCap, BookOpen, Calendar, Globe } from 'lucide-react';
+import { GraduationCap, BookOpen, Calendar, Globe, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
-const programs = [
-  {
-    title: 'Undergraduate Programs',
-    description: 'Bachelor degree programs across various disciplines',
-    icon: GraduationCap,
-    href: '/academic/undergraduate',
-  },
+type Program = {
+  id: string;
+  name: string;
+  degree_type: string;
+  description: string | null;
+};
+
+// Static academic info items
+const staticItems = [
   {
     title: 'Academic Calendar',
     description: 'Important dates, schedules, and academic events',
@@ -24,7 +28,34 @@ const programs = [
   },
 ];
 
+const getDegreeIcon = (degreeType: string) => {
+  switch (degreeType) {
+    case 'undergraduate':
+      return GraduationCap;
+    case 'postgraduate':
+      return BookOpen;
+    case 'doctoral':
+      return BookOpen;
+    default:
+      return GraduationCap;
+  }
+};
+
 const Academic = () => {
+  const { data: programs = [], isLoading } = useQuery({
+    queryKey: ['public-programs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('programs')
+        .select('id, name, degree_type, description')
+        .eq('is_active', true)
+        .order('name', { ascending: true });
+      
+      if (error) throw error;
+      return data as Program[];
+    },
+  });
+
   return (
     <MainLayout>
       {/* Hero Section */}
@@ -42,21 +73,48 @@ const Academic = () => {
       {/* Programs Grid */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8 mb-16">
-            {programs.map((program, idx) => (
-              <Link key={idx} to={program.href}>
-                <div className="bg-card rounded-xl p-8 border hover:shadow-lg transition-all group">
-                  <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                    <program.icon className="w-7 h-7 text-primary" />
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 gap-8 mb-16">
+              {/* Dynamic Programs from Database */}
+              {programs.map((program) => {
+                const Icon = getDegreeIcon(program.degree_type);
+                return (
+                  <Link key={program.id} to={`/programs/${program.id}`}>
+                    <div className="bg-card rounded-xl p-8 border hover:shadow-lg transition-all group h-full">
+                      <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
+                        <Icon className="w-7 h-7 text-primary" />
+                      </div>
+                      <h3 className="font-display text-2xl font-bold mb-3 group-hover:text-primary transition-colors">
+                        {program.name}
+                      </h3>
+                      <p className="text-muted-foreground">
+                        {program.description || `${program.degree_type.charAt(0).toUpperCase() + program.degree_type.slice(1)} program`}
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })}
+
+              {/* Static Items */}
+              {staticItems.map((item, idx) => (
+                <Link key={idx} to={item.href}>
+                  <div className="bg-card rounded-xl p-8 border hover:shadow-lg transition-all group h-full">
+                    <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
+                      <item.icon className="w-7 h-7 text-primary" />
+                    </div>
+                    <h3 className="font-display text-2xl font-bold mb-3 group-hover:text-primary transition-colors">
+                      {item.title}
+                    </h3>
+                    <p className="text-muted-foreground">{item.description}</p>
                   </div>
-                  <h3 className="font-display text-2xl font-bold mb-3 group-hover:text-primary transition-colors">
-                    {program.title}
-                  </h3>
-                  <p className="text-muted-foreground">{program.description}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
+                </Link>
+              ))}
+            </div>
+          )}
 
           {/* CTA */}
           <div className="bg-muted rounded-2xl p-8 md:p-12 text-center">
