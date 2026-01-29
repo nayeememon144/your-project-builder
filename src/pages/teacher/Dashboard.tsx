@@ -8,13 +8,15 @@ import {
   Plus,
   Search,
   Award,
-  TrendingUp
+  TrendingUp,
+  Lock
 } from 'lucide-react';
 import { PortalLayout } from '@/components/layout/PortalLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ChangePasswordForm } from '@/components/teacher/ChangePasswordForm';
 
 const mockPublications = [
   {
@@ -96,6 +98,7 @@ const TeacherDashboard = () => {
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="publications">Publications</TabsTrigger>
               <TabsTrigger value="profile">Profile</TabsTrigger>
+              <TabsTrigger value="security">Security</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
@@ -250,6 +253,10 @@ const TeacherDashboard = () => {
                   </form>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="security">
+              <ChangePasswordForm />
             </TabsContent>
           </Tabs>
         </div>
