@@ -26,16 +26,11 @@ const topBarLinks = [
 
 const facilitiesDropdown = [
   { label: 'DSW', href: '/facilities/dsw' },
-  { label: 'Scholarship & Financial Aids', href: '/facilities/scholarship' },
   { label: 'Halls Of Residence', href: '/facilities/halls' },
   { label: 'Student Organizations', href: '/facilities/organizations' },
-  { label: 'Undergraduate Program', href: '/facilities/undergraduate' },
-  { label: 'Postgraduate Program', href: '/facilities/postgraduate' },
-  { label: 'Student Notices', href: '/notices?category=student' },
   { label: 'E-Resources', href: '/facilities/e-resources' },
   { label: 'Library', href: '/facilities/library' },
   { label: 'Events', href: '/events' },
-  { label: 'Downloads', href: '/downloads' },
 ];
 
 const researchDropdown = [
