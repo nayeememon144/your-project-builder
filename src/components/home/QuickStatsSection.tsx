@@ -59,6 +59,7 @@ export const QuickStatsSection = () => {
         { count: departmentCount },
         { count: programCount },
         { count: teacherCount },
+        { count: studentCount },
         { count: researchCount },
       ] = await Promise.all([
         supabase.from('faculties').select('*', { count: 'exact', head: true }).eq('is_active', true),
@@ -66,6 +67,9 @@ export const QuickStatsSection = () => {
         supabase.from('programs').select('*', { count: 'exact', head: true }).eq('is_active', true),
         supabase.from('profiles').select('*, user_roles!inner(role)', { count: 'exact', head: true })
           .eq('user_roles.role', 'teacher')
+          .eq('is_active', true),
+        supabase.from('profiles').select('*, user_roles!inner(role)', { count: 'exact', head: true })
+          .eq('user_roles.role', 'student')
           .eq('is_active', true),
         supabase.from('research_papers').select('*', { count: 'exact', head: true }).eq('status', 'published'),
       ]);
@@ -75,6 +79,7 @@ export const QuickStatsSection = () => {
         departments: departmentCount || 0,
         programs: programCount || 0,
         teachers: teacherCount || 0,
+        students: studentCount || 0,
         research: researchCount || 0,
       };
     },
@@ -106,8 +111,10 @@ export const QuickStatsSection = () => {
       value = counts.faculties;
     } else if (stat.label.toLowerCase().includes('program') && counts?.programs) {
       value = counts.programs;
-    } else if (stat.label.toLowerCase().includes('teacher') || stat.label.toLowerCase().includes('faculty member')) {
+    } else if (stat.label.toLowerCase().includes('teacher')) {
       value = counts?.teachers || stat.value;
+    } else if (stat.label.toLowerCase().includes('student')) {
+      value = counts?.students || stat.value;
     } else if (stat.label.toLowerCase().includes('research')) {
       value = counts?.research || stat.value;
     }
@@ -121,12 +128,12 @@ export const QuickStatsSection = () => {
     };
   }) || [
     // Default stats if none configured
-    { label: 'Students', value: 8500, icon: GraduationCap },
-    { label: 'Faculty Members', value: counts?.teachers || 350, icon: Users },
-    { label: 'Departments', value: counts?.departments || 4, icon: Building2 },
-    { label: 'Programs', value: counts?.programs || 8, icon: BookOpen },
+    { label: 'Students', value: counts?.students || 0, icon: GraduationCap },
+    { label: 'Teachers', value: counts?.teachers || 0, icon: Users },
+    { label: 'Departments', value: counts?.departments || 0, icon: Building2 },
+    { label: 'Programs', value: counts?.programs || 0, icon: BookOpen },
     { label: 'Research Papers', value: counts?.research || 0, icon: Award },
-    { label: 'Faculties', value: counts?.faculties || 2, icon: Globe },
+    { label: 'Faculties', value: counts?.faculties || 0, icon: Globe },
   ];
 
   return (

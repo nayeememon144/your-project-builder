@@ -29,29 +29,41 @@ interface StatCard {
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
-    totalStudents: 320,
-    totalTeachers: 17,
+    totalStudents: 0,
+    totalTeachers: 0,
     totalNotices: 0,
-    totalDepartments: 4,
+    totalDepartments: 0,
+    totalFaculties: 0,
   });
 
   useEffect(() => {
     const fetchStats = async () => {
-      // Fetch notice count
-      const { count: noticeCount } = await supabase
-        .from('notices')
-        .select('*', { count: 'exact', head: true });
+      // Fetch all counts in parallel
+      const [
+        { count: noticeCount },
+        { count: deptCount },
+        { count: facultyCount },
+        { count: studentCount },
+        { count: teacherCount },
+      ] = await Promise.all([
+        supabase.from('notices').select('*', { count: 'exact', head: true }),
+        supabase.from('departments').select('*', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('faculties').select('*', { count: 'exact', head: true }).eq('is_active', true),
+        supabase.from('profiles').select('*, user_roles!inner(role)', { count: 'exact', head: true })
+          .eq('user_roles.role', 'student')
+          .eq('is_active', true),
+        supabase.from('profiles').select('*, user_roles!inner(role)', { count: 'exact', head: true })
+          .eq('user_roles.role', 'teacher')
+          .eq('is_active', true),
+      ]);
 
-      // Fetch department count  
-      const { count: deptCount } = await supabase
-        .from('departments')
-        .select('*', { count: 'exact', head: true });
-
-      setStats(prev => ({
-        ...prev,
+      setStats({
         totalNotices: noticeCount || 0,
-        totalDepartments: deptCount || 4,
-      }));
+        totalDepartments: deptCount || 0,
+        totalFaculties: facultyCount || 0,
+        totalStudents: studentCount || 0,
+        totalTeachers: teacherCount || 0,
+      });
     };
 
     fetchStats();

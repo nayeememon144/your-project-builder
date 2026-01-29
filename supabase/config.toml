@@ -1,1 +1,7 @@
 project_id = "hschwipsafvnlyujmkfq"
+
+[functions.create-test-users]
+verify_jwt = false
+
+[functions.seed-teachers]
+verify_jwt = false
