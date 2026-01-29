@@ -56,12 +56,10 @@ const noticesDropdown = [
 ];
 
 const aboutDropdown = [
-  { label: 'History of SSTU', href: '/about/history' },
   { label: 'About SSTU', href: '/about' },
-  { label: 'Vision And Mission', href: '/about/vision-mission' },
-  { label: 'Alumni', href: '/about/alumni' },
-  { label: 'Previous Vice Chancellors', href: '/about/previous-vc' },
-  { label: 'Campus Map', href: '/about/campus-map' },
+  { label: 'Faculties', href: '/faculties' },
+  { label: 'Departments', href: '/departments' },
+  { label: 'Teachers', href: '/teachers' },
   { label: 'Photo Gallery', href: '/gallery' },
   { label: 'Contact Us', href: '/contact' },
 ];
