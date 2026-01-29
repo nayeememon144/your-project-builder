@@ -248,11 +248,9 @@ export const Header = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.15 }}
-                        className="fixed left-0 right-0 top-[104px] bg-white shadow-xl z-50 border-t-4 border-gold"
+                        className="absolute left-1/2 -translate-x-1/2 top-full bg-white rounded-lg shadow-2xl z-50 border-t-4 border-gold"
                       >
-                        <div className="container mx-auto">
-                          <AcademicMegaMenu />
-                        </div>
+                        <AcademicMegaMenu />
                       </motion.div>
                     )}
                   </AnimatePresence>
