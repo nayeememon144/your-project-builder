@@ -22,6 +22,7 @@ import AdminSiteSettings from "./pages/admin/SiteSettingsManagement";
 import AdminFacilities from "./pages/admin/FacilitiesManagement";
 import AdminStudents from "./pages/admin/StudentsManagement";
 import AdminResearch from "./pages/admin/ResearchManagement";
+import AdminAcademicCalendar from "./pages/admin/AcademicCalendarManagement";
 import TeacherLogin from "./pages/teacher/Login";
 import TeacherRegister from "./pages/teacher/Register";
 import TeacherDashboard from "./pages/teacher/Dashboard";
@@ -34,6 +35,7 @@ import TeacherProfile from "./pages/TeacherProfile";
 import Teachers from "./pages/Teachers";
 import About from "./pages/About";
 import Academic from "./pages/Academic";
+import AcademicCalendar from "./pages/AcademicCalendar";
 import Admission from "./pages/Admission";
 import Research from "./pages/Research";
 import Departments from "./pages/Departments";
@@ -58,6 +60,7 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/about/*" element={<About />} />
           <Route path="/academic" element={<Academic />} />
+          <Route path="/academic/calendar" element={<AcademicCalendar />} />
           <Route path="/academic/*" element={<Academic />} />
           <Route path="/admission" element={<Admission />} />
           <Route path="/admission/*" element={<Admission />} />
@@ -204,6 +207,14 @@ const App = () => (
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminResearch />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/academic-calendar" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminAcademicCalendar />
               </ProtectedRoute>
             } 
           />

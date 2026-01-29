@@ -11,7 +11,8 @@ import {
   Settings,
   LogOut,
   ChevronRight,
-  Menu
+  Menu,
+  Calendar
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -79,6 +80,11 @@ const menuItems = [
     title: 'Programs', 
     href: '/admin/programs', 
     icon: GraduationCap 
+  },
+  { 
+    title: 'Academic Calendar', 
+    href: '/admin/academic-calendar', 
+    icon: Calendar 
   },
   { 
     title: 'Facilities', 
