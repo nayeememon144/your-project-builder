@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import sstuLogo from '@/assets/sstu-logo.png';
 import { cn } from '@/lib/utils';
+import { AcademicMegaMenu } from './AcademicMegaMenu';
 
 const topBarLinks = [
   { icon: Phone, text: '+880-831-52012', href: 'tel:+880831-52012' },
@@ -66,18 +67,9 @@ const aboutDropdown = [
   { label: 'Contact Us', href: '/contact' },
 ];
 
-const academicsDropdown = [
-  { label: 'Academic Calendar', href: '/academic/calendar' },
-  { label: 'Faculties', href: '/faculties' },
-  { label: 'Departments', href: '/departments' },
-  { label: 'Programs', href: '/academic' },
-  { label: 'Undergraduate Program', href: '/academic/undergraduate' },
-  { label: 'International Students', href: '/academic/international' },
-];
-
 const mainNavItems = [
   { label: 'Home', href: '/' },
-  { label: 'Academics', href: '/academic', dropdown: academicsDropdown },
+  { label: 'Academics', href: '/academic', hasMegaMenu: true },
   { label: 'Admission', href: '/admission' },
   { label: 'Facilities', href: '/facilities', dropdown: facilitiesDropdown },
   { label: 'Research', href: '/research', dropdown: researchDropdown },
@@ -208,7 +200,7 @@ export const Header = () => {
                     )}
                   >
                     {item.label}
-                    {item.dropdown && (
+                    {(item.dropdown || item.hasMegaMenu) && (
                       <ChevronDown className={cn(
                         "w-4 h-4 transition-transform",
                         activeDropdown === item.label && "rotate-180"
@@ -243,6 +235,23 @@ export const Header = () => {
                               {subItem.label}
                             </Link>
                           ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Academic Mega Menu */}
+                  <AnimatePresence>
+                    {activeDropdown === 'Academics' && item.hasMegaMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        transition={{ duration: 0.15 }}
+                        className="fixed left-0 right-0 top-[104px] bg-white shadow-xl z-50 border-t-4 border-gold"
+                      >
+                        <div className="container mx-auto">
+                          <AcademicMegaMenu />
                         </div>
                       </motion.div>
                     )}
