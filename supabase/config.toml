@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.remove-teacher]
 verify_jwt = false
+
+[functions.reset-teacher-password]
+verify_jwt = false
