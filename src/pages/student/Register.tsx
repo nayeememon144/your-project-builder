@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   GraduationCap, 
   Mail, 
@@ -20,6 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
@@ -29,6 +32,7 @@ const registerSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string().min(6, 'Confirm password is required'),
+  programId: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -43,6 +47,22 @@ const StudentRegister = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedProgram, setSelectedProgram] = useState<string>('');
+
+  // Fetch programs for selection
+  const { data: programs } = useQuery({
+    queryKey: ['active-programs'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('programs')
+        .select('id, name, degree_type, departments(name)')
+        .eq('is_active', true)
+        .order('name', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+  });
 
   const { register, handleSubmit, formState: { errors } } = useForm<RegisterForm>({
     resolver: zodResolver(registerSchema),
@@ -151,6 +171,23 @@ const StudentRegister = () => {
                   {errors.studentId && (
                     <p className="text-sm text-destructive">{errors.studentId.message}</p>
                   )}
+                </div>
+
+                {/* Program Selection */}
+                <div className="space-y-2">
+                  <Label htmlFor="program">Program (Optional)</Label>
+                  <Select value={selectedProgram} onValueChange={setSelectedProgram}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your program" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {programs?.map((program) => (
+                        <SelectItem key={program.id} value={program.id}>
+                          {program.name} ({program.degree_type})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2">

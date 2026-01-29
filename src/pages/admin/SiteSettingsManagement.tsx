@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -16,8 +16,10 @@ import {
   Phone,
   Mail,
   MapPin,
-  Globe,
-  Info
+  Info,
+  Image as ImageIcon,
+  User,
+  Upload
 } from 'lucide-react';
 
 type SiteSetting = {
@@ -32,24 +34,38 @@ type SiteSetting = {
 const SiteSettingsManagement = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const glanceImageRef = useRef<HTMLInputElement>(null);
+  const vcImageRef = useRef<HTMLInputElement>(null);
+  const [uploadingGlance, setUploadingGlance] = useState(false);
+  const [uploadingVC, setUploadingVC] = useState(false);
 
-  // About settings
+  // About/At a Glance settings
   const [aboutSettings, setAboutSettings] = useState({
     history: '',
     vision: '',
     mission: '',
     established_year: '2020',
+    glance_image: '',
+    glance_text: '',
+  });
+
+  // VC Message settings
+  const [vcSettings, setVCSettings] = useState({
+    vc_name: '',
+    vc_designation: 'Vice-Chancellor',
+    vc_image: '',
+    vc_message: '',
   });
 
   // Contact settings
   const [contactSettings, setContactSettings] = useState({
-    address: '',
-    city: '',
-    phone1: '',
+    address: 'Shantiganj 3000, Sunamganj, Bangladesh',
+    city: 'Sunamganj, Sylhet Division',
+    phone1: '+880-831-52012',
     phone2: '',
-    email1: '',
+    email1: 'info@sstu.ac.bd',
     email2: '',
-    office_hours: '',
+    office_hours: 'Sunday - Thursday, 9:00 AM - 5:00 PM',
     map_embed_url: '',
   });
 
@@ -68,6 +84,12 @@ const SiteSettingsManagement = () => {
         const value = setting.setting_value as Record<string, string> | null;
         if (setting.setting_key === 'about' && value) {
           setAboutSettings(prev => ({
+            ...prev,
+            ...value,
+          }));
+        }
+        if (setting.setting_key === 'vc_message' && value) {
+          setVCSettings(prev => ({
             ...prev,
             ...value,
           }));
@@ -92,7 +114,7 @@ const SiteSettingsManagement = () => {
         .from('site_settings')
         .select('id')
         .eq('setting_key', key)
-        .single();
+        .maybeSingle();
 
       if (existing) {
         const { error } = await supabase
@@ -120,8 +142,52 @@ const SiteSettingsManagement = () => {
     },
   });
 
+  // Image upload handler
+  const handleImageUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: 'glance' | 'vc'
+  ) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const fileName = `site-settings/${type}-${Date.now()}.${fileExt}`;
+    
+    if (type === 'glance') setUploadingGlance(true);
+    else setUploadingVC(true);
+    
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('attachments')
+        .upload(fileName, file);
+      
+      if (uploadError) throw uploadError;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('attachments')
+        .getPublicUrl(fileName);
+      
+      if (type === 'glance') {
+        setAboutSettings(prev => ({ ...prev, glance_image: publicUrl }));
+      } else {
+        setVCSettings(prev => ({ ...prev, vc_image: publicUrl }));
+      }
+      
+      toast({ title: 'Image uploaded successfully' });
+    } catch (error) {
+      toast({ title: 'Failed to upload image', variant: 'destructive' });
+    } finally {
+      if (type === 'glance') setUploadingGlance(false);
+      else setUploadingVC(false);
+    }
+  };
+
   const handleSaveAbout = () => {
     saveMutation.mutate({ key: 'about', value: aboutSettings });
+  };
+
+  const handleSaveVC = () => {
+    saveMutation.mutate({ key: 'vc_message', value: vcSettings });
   };
 
   const handleSaveContact = () => {
@@ -144,13 +210,21 @@ const SiteSettingsManagement = () => {
         {/* Header */}
         <div>
           <h1 className="text-2xl font-display font-bold text-foreground">Site Settings</h1>
-          <p className="text-muted-foreground">Manage university information, about page, and contact details</p>
+          <p className="text-muted-foreground">Manage university information, about page, VC message, and contact details</p>
         </div>
 
-        <Tabs defaultValue="about" className="space-y-6">
+        <Tabs defaultValue="glance" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="about" className="gap-2">
+            <TabsTrigger value="glance" className="gap-2">
               <Info className="w-4 h-4" />
+              At a Glance
+            </TabsTrigger>
+            <TabsTrigger value="vc" className="gap-2">
+              <User className="w-4 h-4" />
+              VC Message
+            </TabsTrigger>
+            <TabsTrigger value="about" className="gap-2">
+              <Building2 className="w-4 h-4" />
               About
             </TabsTrigger>
             <TabsTrigger value="contact" className="gap-2">
@@ -158,6 +232,181 @@ const SiteSettingsManagement = () => {
               Contact
             </TabsTrigger>
           </TabsList>
+
+          {/* SSTU At a Glance Settings */}
+          <TabsContent value="glance" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ImageIcon className="w-5 h-5" />
+                  SSTU At a Glance
+                </CardTitle>
+                <CardDescription>
+                  Update the "At a Glance" section image and content on the homepage
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Image Upload */}
+                <div className="space-y-2">
+                  <Label>Section Image</Label>
+                  <div className="flex items-start gap-4">
+                    <div className="w-48 h-32 bg-muted rounded-lg overflow-hidden border">
+                      {aboutSettings.glance_image ? (
+                        <img 
+                          src={aboutSettings.glance_image} 
+                          alt="At a Glance" 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          <ImageIcon className="w-8 h-8" />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={glanceImageRef}
+                        onChange={(e) => handleImageUpload(e, 'glance')}
+                        className="hidden"
+                      />
+                      <Button 
+                        variant="outline" 
+                        onClick={() => glanceImageRef.current?.click()}
+                        disabled={uploadingGlance}
+                      >
+                        {uploadingGlance ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <Upload className="w-4 h-4 mr-2" />
+                        )}
+                        Upload Image
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Recommended: 800x500px, JPG/PNG
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="glance_text">Section Content</Label>
+                  <Textarea
+                    id="glance_text"
+                    value={aboutSettings.glance_text}
+                    onChange={(e) => setAboutSettings({ ...aboutSettings, glance_text: e.target.value })}
+                    rows={6}
+                    placeholder="Enter the main description for the SSTU At a Glance section..."
+                  />
+                </div>
+
+                <Button onClick={handleSaveAbout} disabled={saveMutation.isPending} className="gap-2">
+                  {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  <Save className="w-4 h-4" />
+                  Save At a Glance Settings
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* VC Message Settings */}
+          <TabsContent value="vc" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <User className="w-5 h-5" />
+                  Vice-Chancellor Message
+                </CardTitle>
+                <CardDescription>
+                  Update the Vice-Chancellor's photo and message on the homepage
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* VC Image Upload */}
+                <div className="space-y-2">
+                  <Label>Vice-Chancellor Photo</Label>
+                  <div className="flex items-start gap-4">
+                    <div className="w-32 h-32 bg-muted rounded-full overflow-hidden border-4 border-gold/30">
+                      {vcSettings.vc_image ? (
+                        <img 
+                          src={vcSettings.vc_image} 
+                          alt="Vice Chancellor" 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          <User className="w-12 h-12" />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={vcImageRef}
+                        onChange={(e) => handleImageUpload(e, 'vc')}
+                        className="hidden"
+                      />
+                      <Button 
+                        variant="outline" 
+                        onClick={() => vcImageRef.current?.click()}
+                        disabled={uploadingVC}
+                      >
+                        {uploadingVC ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <Upload className="w-4 h-4 mr-2" />
+                        )}
+                        Upload Photo
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Square image recommended (400x400px)
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="vc_name">VC Name</Label>
+                    <Input
+                      id="vc_name"
+                      value={vcSettings.vc_name}
+                      onChange={(e) => setVCSettings({ ...vcSettings, vc_name: e.target.value })}
+                      placeholder="Prof. Dr. Name"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="vc_designation">Designation</Label>
+                    <Input
+                      id="vc_designation"
+                      value={vcSettings.vc_designation}
+                      onChange={(e) => setVCSettings({ ...vcSettings, vc_designation: e.target.value })}
+                      placeholder="Vice-Chancellor"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="vc_message">Message</Label>
+                  <Textarea
+                    id="vc_message"
+                    value={vcSettings.vc_message}
+                    onChange={(e) => setVCSettings({ ...vcSettings, vc_message: e.target.value })}
+                    rows={6}
+                    placeholder="Enter the Vice-Chancellor's welcome message..."
+                  />
+                </div>
+
+                <Button onClick={handleSaveVC} disabled={saveMutation.isPending} className="gap-2">
+                  {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  <Save className="w-4 h-4" />
+                  Save VC Message
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* About Settings */}
           <TabsContent value="about" className="space-y-6">
@@ -229,7 +478,7 @@ const SiteSettingsManagement = () => {
                   Contact Information
                 </CardTitle>
                 <CardDescription>
-                  Update contact details displayed on the website
+                  Update contact details - these will appear in the Contact page and Footer across the website
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -240,7 +489,7 @@ const SiteSettingsManagement = () => {
                       id="address"
                       value={contactSettings.address}
                       onChange={(e) => setContactSettings({ ...contactSettings, address: e.target.value })}
-                      placeholder="e.g., Shantiganj"
+                      placeholder="e.g., Shantiganj 3000, Sunamganj, Bangladesh"
                     />
                   </div>
                   <div className="space-y-2">
@@ -249,7 +498,7 @@ const SiteSettingsManagement = () => {
                       id="city"
                       value={contactSettings.city}
                       onChange={(e) => setContactSettings({ ...contactSettings, city: e.target.value })}
-                      placeholder="e.g., Sunamganj, Bangladesh"
+                      placeholder="e.g., Sunamganj, Sylhet Division"
                     />
                   </div>
                 </div>
@@ -265,7 +514,7 @@ const SiteSettingsManagement = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="phone2">Phone 2</Label>
+                    <Label htmlFor="phone2">Phone 2 (Optional)</Label>
                     <Input
                       id="phone2"
                       value={contactSettings.phone2}
@@ -287,7 +536,7 @@ const SiteSettingsManagement = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email2">Email 2</Label>
+                    <Label htmlFor="email2">Email 2 (Optional)</Label>
                     <Input
                       id="email2"
                       type="email"

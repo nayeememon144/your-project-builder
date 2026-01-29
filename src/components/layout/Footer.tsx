@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   MapPin, 
   Phone, 
@@ -45,7 +47,33 @@ const socialLinks = [
   { icon: Linkedin, href: 'https://linkedin.com/school/sstu', label: 'LinkedIn' },
 ];
 
+// Default contact info
+const defaultContact = {
+  address: 'Shantiganj 3000, Sunamganj, Bangladesh',
+  city: 'Sunamgonj Sadar, Sylhet Division',
+  phone1: '+880-831-52012',
+  email1: 'info@sstu.ac.bd',
+  map_embed_url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3619.1234567890123!2d91.39892961500789!3d24.86621398404831!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x375058ba92ad11f1%3A0xba7d98d1e1b1b1b1!2sSunamganj%20Science%20and%20Technology%20University!5e0!3m2!1sen!2sbd!4v1706370000000!5m2!1sen!2sbd',
+};
+
 export const Footer = () => {
+  // Fetch contact settings
+  const { data: contactSettings } = useQuery({
+    queryKey: ['site-settings-contact'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'contact')
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data?.setting_value as typeof defaultContact | null;
+    },
+  });
+
+  const contact = contactSettings || defaultContact;
+
   return (
     <footer className="bg-primary text-primary-foreground">
       {/* Main Footer */}
@@ -131,22 +159,22 @@ export const Footer = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-white">Sunamgonj Science & Technology University</h4>
-                    <p className="text-sm text-primary-foreground/70">Shantiganj 3000, Sunamganj, Bangladesh</p>
+                    <p className="text-sm text-primary-foreground/70">{contact.address}</p>
                   </div>
                 </div>
                 
                 <div className="space-y-3">
                   <div className="flex items-center gap-3 text-sm">
                     <MapPin className="w-4 h-4 text-gold" />
-                    <span className="text-primary-foreground/80">Sunamgonj Sadar, Sylhet Division</span>
+                    <span className="text-primary-foreground/80">{contact.city}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="w-4 h-4 text-gold" />
-                    <span className="text-primary-foreground/80">+880-831-52012</span>
+                    <span className="text-primary-foreground/80">{contact.phone1}</span>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Mail className="w-4 h-4 text-gold" />
-                    <span className="text-primary-foreground/80">info@sstu.ac.bd</span>
+                    <span className="text-primary-foreground/80">{contact.email1}</span>
                   </div>
                 </div>
 
@@ -173,7 +201,7 @@ export const Footer = () => {
               {/* Map - SSTU Location */}
               <div className="bg-primary-foreground/10 rounded-lg overflow-hidden h-48">
                 <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3619.1234567890123!2d91.39892961500789!3d24.86621398404831!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x375058ba92ad11f1%3A0xba7d98d1e1b1b1b1!2sSunamganj%20Science%20and%20Technology%20University!5e0!3m2!1sen!2sbd!4v1706370000000!5m2!1sen!2sbd"
+                  src={contact.map_embed_url || defaultContact.map_embed_url}
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}

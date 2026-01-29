@@ -2,8 +2,43 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+
+const defaultVC = {
+  image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80',
+  name: '',
+  designation: 'Vice-Chancellor',
+  message: `I am delighted to welcome you all to the official website of Sunamgonj 
+Science and Technology University. The university will award you not only academic 
+degrees but will enrich you culturally, professionally, and morally. I am proud to 
+say that SSTU is dedicated to nurturing innovative minds and contributing to the 
+nation's development through quality education and research.`,
+};
 
 export const VCMessageSection = () => {
+  const { data: settings } = useQuery({
+    queryKey: ['site-settings-vc'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'vc_message')
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data?.setting_value as { 
+        vc_image?: string; 
+        vc_name?: string;
+        vc_designation?: string;
+        vc_message?: string;
+      } | null;
+    },
+  });
+
+  const vcImage = settings?.vc_image || defaultVC.image;
+  const vcMessage = settings?.vc_message || defaultVC.message;
+
   return (
     <section className="py-16 bg-gradient-to-r from-primary via-primary to-primary/95">
       <div className="container mx-auto">
@@ -18,7 +53,7 @@ export const VCMessageSection = () => {
           >
             <div className="w-48 h-48 md:w-56 md:h-56 rounded-full border-4 border-gold overflow-hidden shadow-2xl">
               <img
-                src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&q=80"
+                src={vcImage}
                 alt="Vice Chancellor"
                 className="w-full h-full object-cover"
               />
@@ -40,11 +75,7 @@ export const VCMessageSection = () => {
               MESSAGE FROM VICE-CHANCELLOR
             </h2>
             <p className="text-white/90 leading-relaxed mb-6 max-w-3xl">
-              I am delighted to welcome you all to the official website of Sunamgonj 
-              Science and Technology University. The university will award you not only academic 
-              degrees but will enrich you culturally, professionally, and morally. I am proud to 
-              say that SSTU is dedicated to nurturing innovative minds and contributing to the 
-              nation's development through quality education and research.
+              {vcMessage}
             </p>
             <Link to="/about/vice-chancellor">
               <Button className="bg-gold text-primary hover:bg-gold/90 group font-semibold">

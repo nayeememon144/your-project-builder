@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -11,7 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Search, UserCheck, UserX, Eye, FileText, CheckCircle, XCircle, Clock, ExternalLink } from 'lucide-react';
+import { Search, UserCheck, UserX, Eye, Plus, CheckCircle, Clock, ExternalLink, Loader2, Upload } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 
@@ -53,7 +55,24 @@ const TeachersManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherProfile | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
+  const [newTeacher, setNewTeacher] = useState({
+    full_name: '',
+    email: '',
+    password: '',
+    phone: '',
+    designation: '',
+    employee_id: '',
+    department_id: '',
+    academic_background: '',
+    professional_experience: '',
+    profile_photo: '',
+  });
 
   // Fetch teachers with their role
   const { data: teachers, isLoading: teachersLoading } = useQuery({
@@ -79,7 +98,8 @@ const TeachersManagement = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('departments')
-        .select('id, name, short_name');
+        .select('id, name, short_name')
+        .eq('is_active', true);
       if (error) throw error;
       return data;
     },
@@ -99,6 +119,71 @@ const TeachersManagement = () => {
       return data as ResearchPaper[];
     },
     enabled: !!selectedTeacher,
+  });
+
+  // Add new teacher mutation
+  const addTeacherMutation = useMutation({
+    mutationFn: async (data: typeof newTeacher) => {
+      // Create auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/teacher/login`,
+          data: {
+            full_name: data.full_name,
+            role: 'teacher',
+          },
+        },
+      });
+
+      if (authError) throw authError;
+      if (!authData.user) throw new Error('Failed to create user');
+
+      // Update profile with additional info
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          phone: data.phone || null,
+          designation: data.designation || null,
+          employee_id: data.employee_id || null,
+          department_id: data.department_id || null,
+          academic_background: data.academic_background || null,
+          professional_experience: data.professional_experience || null,
+          profile_photo: data.profile_photo || null,
+          is_active: true,
+          is_verified: true,
+        })
+        .eq('user_id', authData.user.id);
+
+      if (profileError) throw profileError;
+
+      return authData.user;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-teachers'] });
+      setIsAddOpen(false);
+      setNewTeacher({
+        full_name: '',
+        email: '',
+        password: '',
+        phone: '',
+        designation: '',
+        employee_id: '',
+        department_id: '',
+        academic_background: '',
+        professional_experience: '',
+        profile_photo: '',
+      });
+      toast({ title: 'Teacher added successfully! They can now login with their email and password.' });
+    },
+    onError: (error: Error) => {
+      toast({ 
+        title: 'Failed to add teacher', 
+        description: error.message,
+        variant: 'destructive' 
+      });
+    },
   });
 
   // Verify/Unverify teacher
@@ -159,6 +244,44 @@ const TeachersManagement = () => {
     },
   });
 
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const fileName = `teachers/${Date.now()}.${fileExt}`;
+    
+    setUploadingPhoto(true);
+    
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('attachments')
+        .upload(fileName, file);
+      
+      if (uploadError) throw uploadError;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('attachments')
+        .getPublicUrl(fileName);
+      
+      setNewTeacher(prev => ({ ...prev, profile_photo: publicUrl }));
+      toast({ title: 'Photo uploaded' });
+    } catch (error) {
+      toast({ title: 'Failed to upload photo', variant: 'destructive' });
+    } finally {
+      setUploadingPhoto(false);
+    }
+  };
+
+  const handleAddTeacher = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTeacher.full_name || !newTeacher.email || !newTeacher.password) {
+      toast({ title: 'Please fill in all required fields', variant: 'destructive' });
+      return;
+    }
+    addTeacherMutation.mutate(newTeacher);
+  };
+
   const getDepartmentName = (deptId: string | null) => {
     if (!deptId || !departments) return 'Not Assigned';
     const dept = departments.find(d => d.id === deptId);
@@ -186,9 +309,15 @@ const TeachersManagement = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Teachers Management</h1>
-          <p className="text-muted-foreground">View, verify, and manage teacher profiles and publications</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold">Teachers Management</h1>
+            <p className="text-muted-foreground">Add, view, verify, and manage teacher profiles and publications</p>
+          </div>
+          <Button onClick={() => setIsAddOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Teacher
+          </Button>
         </div>
 
         {/* Filters */}
@@ -313,11 +442,190 @@ const TeachersManagement = () => {
           <div className="text-center py-12 bg-muted/50 rounded-xl">
             <UserCheck className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
             <h3 className="font-semibold mb-2">No Teachers Found</h3>
-            <p className="text-muted-foreground">
-              {searchQuery ? 'Try adjusting your search query' : 'No teachers have registered yet'}
+            <p className="text-muted-foreground mb-4">
+              {searchQuery ? 'Try adjusting your search query' : 'Add your first teacher to get started'}
             </p>
+            <Button onClick={() => setIsAddOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              Add Teacher
+            </Button>
           </div>
         )}
+
+        {/* Add Teacher Dialog */}
+        <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Add New Teacher</DialogTitle>
+            </DialogHeader>
+            
+            <form onSubmit={handleAddTeacher} className="space-y-4 mt-4">
+              {/* Profile Photo */}
+              <div className="flex items-start gap-4">
+                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-dashed">
+                  {newTeacher.profile_photo ? (
+                    <img src={newTeacher.profile_photo} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-muted-foreground text-2xl">?</span>
+                  )}
+                </div>
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={photoInputRef}
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => photoInputRef.current?.click()}
+                    disabled={uploadingPhoto}
+                  >
+                    {uploadingPhoto ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    ) : (
+                      <Upload className="w-4 h-4 mr-2" />
+                    )}
+                    Upload Photo
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1">Optional</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="full_name">Full Name *</Label>
+                  <Input
+                    id="full_name"
+                    value={newTeacher.full_name}
+                    onChange={(e) => setNewTeacher({ ...newTeacher, full_name: e.target.value })}
+                    placeholder="Prof. Dr. Name"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={newTeacher.email}
+                    onChange={(e) => setNewTeacher({ ...newTeacher, email: e.target.value })}
+                    placeholder="teacher@sstu.ac.bd"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password *</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={newTeacher.password}
+                    onChange={(e) => setNewTeacher({ ...newTeacher, password: e.target.value })}
+                    placeholder="Min 6 characters"
+                    required
+                  />
+                  <p className="text-xs text-muted-foreground">Teacher can change this later</p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    value={newTeacher.phone}
+                    onChange={(e) => setNewTeacher({ ...newTeacher, phone: e.target.value })}
+                    placeholder="+880-XXX-XXXXXXX"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="designation">Designation</Label>
+                  <Select
+                    value={newTeacher.designation}
+                    onValueChange={(value) => setNewTeacher({ ...newTeacher, designation: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select designation" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Professor">Professor</SelectItem>
+                      <SelectItem value="Associate Professor">Associate Professor</SelectItem>
+                      <SelectItem value="Assistant Professor">Assistant Professor</SelectItem>
+                      <SelectItem value="Lecturer">Lecturer</SelectItem>
+                      <SelectItem value="Senior Lecturer">Senior Lecturer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="employee_id">Employee ID</Label>
+                  <Input
+                    id="employee_id"
+                    value={newTeacher.employee_id}
+                    onChange={(e) => setNewTeacher({ ...newTeacher, employee_id: e.target.value })}
+                    placeholder="e.g., SSTU-FAC-001"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="department_id">Department</Label>
+                <Select
+                  value={newTeacher.department_id}
+                  onValueChange={(value) => setNewTeacher({ ...newTeacher, department_id: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments?.map((dept) => (
+                      <SelectItem key={dept.id} value={dept.id}>
+                        {dept.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="academic_background">Academic Background</Label>
+                <Textarea
+                  id="academic_background"
+                  value={newTeacher.academic_background}
+                  onChange={(e) => setNewTeacher({ ...newTeacher, academic_background: e.target.value })}
+                  placeholder="PhD in Computer Science from..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="professional_experience">Professional Experience</Label>
+                <Textarea
+                  id="professional_experience"
+                  value={newTeacher.professional_experience}
+                  onChange={(e) => setNewTeacher({ ...newTeacher, professional_experience: e.target.value })}
+                  placeholder="10+ years of teaching experience..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button type="button" variant="outline" onClick={() => setIsAddOpen(false)} className="flex-1">
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={addTeacherMutation.isPending} className="flex-1">
+                  {addTeacherMutation.isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                  Add Teacher
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
 
         {/* Teacher Detail Dialog */}
         <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
@@ -430,93 +738,92 @@ const TeachersManagement = () => {
                   ) : papers && papers.length > 0 ? (
                     <div className="space-y-4">
                       {papers.map((paper) => (
-                        <div key={paper.id} className="border rounded-lg p-4">
+                        <div key={paper.id} className="p-4 border rounded-lg">
                           <div className="flex justify-between items-start gap-4">
                             <div className="flex-1">
-                              <h4 className="font-medium">{paper.title}</h4>
+                              <h4 className="font-semibold">{paper.title}</h4>
                               <p className="text-sm text-muted-foreground mt-1">
                                 {paper.authors.join(', ')}
                               </p>
                               {paper.journal_conference_name && (
-                                <p className="text-sm text-muted-foreground italic">
-                                  {paper.journal_conference_name}
+                                <p className="text-sm text-muted-foreground">
+                                  {paper.journal_conference_name} • {paper.publication_date}
                                 </p>
                               )}
-                              <div className="flex items-center gap-2 mt-2">
-                                <Badge variant={
-                                  paper.status === 'published' ? 'default' :
-                                  paper.status === 'pending' ? 'secondary' : 'destructive'
-                                }>
-                                  {paper.status}
-                                </Badge>
-                                {paper.publication_date && (
-                                  <span className="text-xs text-muted-foreground">
-                                    {format(new Date(paper.publication_date), 'MMM yyyy')}
-                                  </span>
-                                )}
-                              </div>
+                              {paper.doi_link && (
+                                <a href={paper.doi_link} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                                  DOI Link →
+                                </a>
+                              )}
                             </div>
-                            {paper.status === 'pending' && (
-                              <div className="flex gap-2">
-                                <Button 
-                                  size="sm" 
-                                  onClick={() => paperStatusMutation.mutate({ id: paper.id, status: 'published' })}
-                                >
-                                  <CheckCircle className="w-3 h-3 mr-1" />
-                                  Approve
-                                </Button>
-                                <Button 
-                                  size="sm" 
-                                  variant="destructive"
-                                  onClick={() => paperStatusMutation.mutate({ id: paper.id, status: 'archived' })}
-                                >
-                                  <XCircle className="w-3 h-3 mr-1" />
-                                  Reject
-                                </Button>
-                              </div>
-                            )}
+                            <div className="flex flex-col gap-2 items-end">
+                              <Badge variant={
+                                paper.status === 'published' ? 'default' : 
+                                paper.status === 'pending' ? 'outline' : 'secondary'
+                              }>
+                                {paper.status}
+                              </Badge>
+                              {paper.status === 'pending' && (
+                                <div className="flex gap-2">
+                                  <Button 
+                                    size="sm" 
+                                    onClick={() => paperStatusMutation.mutate({ id: paper.id, status: 'published' })}
+                                    disabled={paperStatusMutation.isPending}
+                                  >
+                                    Approve
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => paperStatusMutation.mutate({ id: paper.id, status: 'archived' })}
+                                    disabled={paperStatusMutation.isPending}
+                                  >
+                                    Reject
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-8">
-                      <FileText className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                      <p className="text-muted-foreground">No publications submitted yet</p>
+                    <div className="text-center py-8 text-muted-foreground">
+                      No publications submitted yet
                     </div>
                   )}
                 </TabsContent>
 
-                <TabsContent value="settings" className="mt-4 space-y-6">
+                <TabsContent value="settings" className="mt-4 space-y-4">
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
-                      <h4 className="font-medium">Account Status</h4>
+                      <h4 className="font-medium">Active Status</h4>
                       <p className="text-sm text-muted-foreground">
-                        {selectedTeacher.is_active ? 'This account is currently active' : 'This account is deactivated'}
+                        Active teachers appear on the website
                       </p>
                     </div>
                     <Switch
-                      checked={selectedTeacher.is_active ?? false}
-                      onCheckedChange={(checked) => {
-                        activateMutation.mutate({ id: selectedTeacher.id, active: checked });
-                        setSelectedTeacher({ ...selectedTeacher, is_active: checked });
-                      }}
+                      checked={selectedTeacher.is_active ?? true}
+                      onCheckedChange={(checked) => 
+                        activateMutation.mutate({ id: selectedTeacher.id, active: checked })
+                      }
+                      disabled={activateMutation.isPending}
                     />
                   </div>
 
                   <div className="flex items-center justify-between p-4 border rounded-lg">
                     <div>
-                      <h4 className="font-medium">Verification Status</h4>
+                      <h4 className="font-medium">Verified Status</h4>
                       <p className="text-sm text-muted-foreground">
-                        {selectedTeacher.is_verified ? 'This teacher is verified' : 'This teacher is not verified'}
+                        Verified teachers have a badge on their profile
                       </p>
                     </div>
                     <Switch
                       checked={selectedTeacher.is_verified ?? false}
-                      onCheckedChange={(checked) => {
-                        verifyMutation.mutate({ id: selectedTeacher.id, verified: checked });
-                        setSelectedTeacher({ ...selectedTeacher, is_verified: checked });
-                      }}
+                      onCheckedChange={(checked) => 
+                        verifyMutation.mutate({ id: selectedTeacher.id, verified: checked })
+                      }
+                      disabled={verifyMutation.isPending}
                     />
                   </div>
                 </TabsContent>
