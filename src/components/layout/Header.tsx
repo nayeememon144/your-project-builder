@@ -46,14 +46,13 @@ const researchDropdown = [
 
 const noticesDropdown = [
   { label: 'All Notices', href: '/notices' },
-  { label: 'Student Notices', href: '/notices?category=student' },
   { label: 'General Notices', href: '/notices?category=general' },
-  { label: 'Appointments', href: '/notices?category=appointments' },
-  { label: 'Offices Orders/NOC', href: '/notices?category=orders' },
-  { label: 'Scholarship & Financial Aids', href: '/notices?category=scholarship' },
+  { label: 'Exam Notices', href: '/notices?category=exam' },
+  { label: 'Scholarship Notices', href: '/notices?category=scholarship' },
+  { label: 'Admission Notices', href: '/notices?category=admission' },
+  { label: 'Workshop Notices', href: '/notices?category=workshop' },
+  { label: 'Recruitment Notices', href: '/notices?category=recruitment' },
   { label: 'Academic Calendar', href: '/academic/calendar' },
-  { label: 'Tender/E-Tender', href: '/notices?category=tender' },
-  { label: 'Downloads', href: '/downloads' },
 ];
 
 const aboutDropdown = [

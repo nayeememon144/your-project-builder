@@ -58,8 +58,11 @@ const NoticesPage = () => {
   }, []);
 
   useEffect(() => {
-    fetchNotices();
-  }, [selectedCategory, currentPage, searchQuery]);
+    // Only fetch notices after categories are loaded (or if no category filter is applied)
+    if (categories.length > 0 || !selectedCategory) {
+      fetchNotices();
+    }
+  }, [selectedCategory, currentPage, searchQuery, categories]);
 
   const fetchCategories = async () => {
     const { data, error } = await supabase
@@ -94,11 +97,18 @@ const NoticesPage = () => {
       .order('is_pinned', { ascending: false })
       .order('published_at', { ascending: false });
 
-    // Filter by category
+    // Filter by category using slug directly from notice_categories
     if (selectedCategory) {
       const category = categories.find(c => c.slug === selectedCategory);
       if (category) {
         query = query.eq('category_id', category.id);
+      } else {
+        // If category slug doesn't match any known category, show no results
+        // This prevents showing all notices when category param is invalid
+        setNotices([]);
+        setTotalCount(0);
+        setLoading(false);
+        return;
       }
     }
 
