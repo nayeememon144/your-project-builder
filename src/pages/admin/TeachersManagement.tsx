@@ -9,11 +9,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Search, UserCheck, UserX, Eye, Plus, CheckCircle, Clock, ExternalLink, Loader2, Upload } from 'lucide-react';
+import { Search, UserCheck, UserX, Eye, Plus, CheckCircle, Clock, ExternalLink, Loader2, Upload, Pencil, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 
@@ -56,15 +57,30 @@ const TeachersManagement = () => {
   const [selectedTeacher, setSelectedTeacher] = useState<TeacherProfile | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [uploadingEditPhoto, setUploadingEditPhoto] = useState(false);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const editPhotoInputRef = useRef<HTMLInputElement>(null);
 
   const [newTeacher, setNewTeacher] = useState({
     full_name: '',
     email: '',
     password: '',
+    phone: '',
+    designation: '',
+    employee_id: '',
+    department_id: '',
+    academic_background: '',
+    professional_experience: '',
+    profile_photo: '',
+  });
+
+  const [editTeacher, setEditTeacher] = useState({
+    full_name: '',
+    email: '',
     phone: '',
     designation: '',
     employee_id: '',
@@ -179,6 +195,72 @@ const TeachersManagement = () => {
     },
   });
 
+  // Update teacher mutation using edge function
+  const updateTeacherMutation = useMutation({
+    mutationFn: async (data: { user_id: string } & typeof editTeacher) => {
+      const { data: result, error } = await supabase.functions.invoke('update-teacher', {
+        body: {
+          user_id: data.user_id,
+          full_name: data.full_name || null,
+          email: data.email || null,
+          phone: data.phone || null,
+          designation: data.designation || null,
+          employee_id: data.employee_id || null,
+          department_id: data.department_id || null,
+          academic_background: data.academic_background || null,
+          professional_experience: data.professional_experience || null,
+          profile_photo: data.profile_photo || null,
+        }
+      });
+
+      if (error) throw error;
+      if (!result.success) throw new Error(result.error);
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-teachers'] });
+      setIsEditOpen(false);
+      setSelectedTeacher(null);
+      toast({ title: 'Teacher profile updated successfully!' });
+    },
+    onError: (error: Error) => {
+      toast({ 
+        title: 'Failed to update teacher', 
+        description: error.message,
+        variant: 'destructive' 
+      });
+    },
+  });
+
+  // Remove teacher mutation using edge function
+  const removeTeacherMutation = useMutation({
+    mutationFn: async (user_id: string) => {
+      const { data: result, error } = await supabase.functions.invoke('remove-teacher', {
+        body: { user_id }
+      });
+
+      if (error) throw error;
+      if (!result.success) throw new Error(result.error);
+
+      return result;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-teachers'] });
+      setIsRemoveDialogOpen(false);
+      setIsDetailOpen(false);
+      setSelectedTeacher(null);
+      toast({ title: 'Teacher removed successfully. They can no longer access the platform.' });
+    },
+    onError: (error: Error) => {
+      toast({ 
+        title: 'Failed to remove teacher', 
+        description: error.message,
+        variant: 'destructive' 
+      });
+    },
+  });
+
   // Verify/Unverify teacher
   const verifyMutation = useMutation({
     mutationFn: async ({ id, verified }: { id: string; verified: boolean }) => {
@@ -266,6 +348,35 @@ const TeachersManagement = () => {
     }
   };
 
+  const handleEditPhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    
+    const file = e.target.files[0];
+    const fileExt = file.name.split('.').pop();
+    const fileName = `teachers/${Date.now()}.${fileExt}`;
+    
+    setUploadingEditPhoto(true);
+    
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from('attachments')
+        .upload(fileName, file);
+      
+      if (uploadError) throw uploadError;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('attachments')
+        .getPublicUrl(fileName);
+      
+      setEditTeacher(prev => ({ ...prev, profile_photo: publicUrl }));
+      toast({ title: 'Photo uploaded' });
+    } catch (error) {
+      toast({ title: 'Failed to upload photo', variant: 'destructive' });
+    } finally {
+      setUploadingEditPhoto(false);
+    }
+  };
+
   const handleAddTeacher = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTeacher.full_name || !newTeacher.email || !newTeacher.password) {
@@ -273,6 +384,32 @@ const TeachersManagement = () => {
       return;
     }
     addTeacherMutation.mutate(newTeacher);
+  };
+
+  const handleEditTeacher = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedTeacher) return;
+    if (!editTeacher.full_name) {
+      toast({ title: 'Full name is required', variant: 'destructive' });
+      return;
+    }
+    updateTeacherMutation.mutate({ user_id: selectedTeacher.user_id, ...editTeacher });
+  };
+
+  const openEditDialog = (teacher: TeacherProfile) => {
+    setSelectedTeacher(teacher);
+    setEditTeacher({
+      full_name: teacher.full_name || '',
+      email: teacher.email || '',
+      phone: teacher.phone || '',
+      designation: teacher.designation || '',
+      employee_id: teacher.employee_id || '',
+      department_id: teacher.department_id || '',
+      academic_background: teacher.academic_background || '',
+      professional_experience: teacher.professional_experience || '',
+      profile_photo: teacher.profile_photo || '',
+    });
+    setIsEditOpen(true);
   };
 
   const getDepartmentName = (deptId: string | null) => {
@@ -403,6 +540,10 @@ const TeachersManagement = () => {
                         <Button size="sm" variant="outline" onClick={() => openDetails(teacher)}>
                           <Eye className="w-4 h-4 mr-1" />
                           View
+                        </Button>
+                        <Button size="sm" variant="outline" onClick={() => openEditDialog(teacher)}>
+                          <Pencil className="w-4 h-4 mr-1" />
+                          Edit
                         </Button>
                         {!teacher.is_verified ? (
                           <Button 
@@ -620,6 +761,168 @@ const TeachersManagement = () => {
           </DialogContent>
         </Dialog>
 
+        {/* Edit Teacher Dialog */}
+        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Teacher Profile</DialogTitle>
+            </DialogHeader>
+            
+            <form onSubmit={handleEditTeacher} className="space-y-4 mt-4">
+              {/* Profile Photo */}
+              <div className="flex items-start gap-4">
+                <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-dashed">
+                  {editTeacher.profile_photo ? (
+                    <img src={editTeacher.profile_photo} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-muted-foreground text-2xl">?</span>
+                  )}
+                </div>
+                <div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={editPhotoInputRef}
+                    onChange={handleEditPhotoUpload}
+                    className="hidden"
+                  />
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => editPhotoInputRef.current?.click()}
+                    disabled={uploadingEditPhoto}
+                  >
+                    {uploadingEditPhoto ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    ) : (
+                      <Upload className="w-4 h-4 mr-2" />
+                    )}
+                    Change Photo
+                  </Button>
+                  <p className="text-xs text-muted-foreground mt-1">Optional</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit_full_name">Full Name *</Label>
+                  <Input
+                    id="edit_full_name"
+                    value={editTeacher.full_name}
+                    onChange={(e) => setEditTeacher({ ...editTeacher, full_name: e.target.value })}
+                    placeholder="Prof. Dr. Name"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit_email">Email</Label>
+                  <Input
+                    id="edit_email"
+                    type="email"
+                    value={editTeacher.email}
+                    onChange={(e) => setEditTeacher({ ...editTeacher, email: e.target.value })}
+                    placeholder="teacher@sstu.ac.bd"
+                  />
+                  <p className="text-xs text-muted-foreground">Changing email will update login credentials</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit_phone">Phone</Label>
+                  <Input
+                    id="edit_phone"
+                    value={editTeacher.phone}
+                    onChange={(e) => setEditTeacher({ ...editTeacher, phone: e.target.value })}
+                    placeholder="+880-XXX-XXXXXXX"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit_designation">Designation</Label>
+                  <Select
+                    value={editTeacher.designation}
+                    onValueChange={(value) => setEditTeacher({ ...editTeacher, designation: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select designation" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Professor">Professor</SelectItem>
+                      <SelectItem value="Associate Professor">Associate Professor</SelectItem>
+                      <SelectItem value="Assistant Professor">Assistant Professor</SelectItem>
+                      <SelectItem value="Lecturer">Lecturer</SelectItem>
+                      <SelectItem value="Senior Lecturer">Senior Lecturer</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="edit_employee_id">Employee ID</Label>
+                  <Input
+                    id="edit_employee_id"
+                    value={editTeacher.employee_id}
+                    onChange={(e) => setEditTeacher({ ...editTeacher, employee_id: e.target.value })}
+                    placeholder="e.g., SSTU-FAC-001"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="edit_department_id">Department</Label>
+                  <Select
+                    value={editTeacher.department_id}
+                    onValueChange={(value) => setEditTeacher({ ...editTeacher, department_id: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments?.map((dept) => (
+                        <SelectItem key={dept.id} value={dept.id}>
+                          {dept.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit_academic_background">Academic Background</Label>
+                <Textarea
+                  id="edit_academic_background"
+                  value={editTeacher.academic_background}
+                  onChange={(e) => setEditTeacher({ ...editTeacher, academic_background: e.target.value })}
+                  placeholder="PhD in Computer Science from..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="edit_professional_experience">Professional Experience</Label>
+                <Textarea
+                  id="edit_professional_experience"
+                  value={editTeacher.professional_experience}
+                  onChange={(e) => setEditTeacher({ ...editTeacher, professional_experience: e.target.value })}
+                  placeholder="10+ years of teaching experience..."
+                  rows={3}
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} className="flex-1">
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={updateTeacherMutation.isPending} className="flex-1">
+                  {updateTeacherMutation.isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                  Save Changes
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+
         {/* Teacher Detail Dialog */}
         <Dialog open={isDetailOpen} onOpenChange={setIsDetailOpen}>
           <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -819,11 +1122,52 @@ const TeachersManagement = () => {
                       disabled={verifyMutation.isPending}
                     />
                   </div>
+
+                  {/* Danger Zone */}
+                  <div className="p-4 border border-destructive/50 rounded-lg bg-destructive/5 mt-6">
+                    <h4 className="font-medium text-destructive">Danger Zone</h4>
+                    <p className="text-sm text-muted-foreground mt-1 mb-4">
+                      Permanently remove this teacher from the platform. This action cannot be undone.
+                    </p>
+                    <Button 
+                      variant="destructive" 
+                      onClick={() => setIsRemoveDialogOpen(true)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Remove Teacher
+                    </Button>
+                  </div>
                 </TabsContent>
               </Tabs>
             )}
           </DialogContent>
         </Dialog>
+
+        {/* Remove Teacher Confirmation Dialog */}
+        <AlertDialog open={isRemoveDialogOpen} onOpenChange={setIsRemoveDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Remove Teacher?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will permanently delete <strong>{selectedTeacher?.full_name}</strong>'s account and all associated data. 
+                They will immediately lose access to the platform and cannot log in again.
+                <br /><br />
+                This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => selectedTeacher && removeTeacherMutation.mutate(selectedTeacher.user_id)}
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                disabled={removeTeacherMutation.isPending}
+              >
+                {removeTeacherMutation.isPending && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                Yes, Remove Teacher
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </AdminLayout>
   );
