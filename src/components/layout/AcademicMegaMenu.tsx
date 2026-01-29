@@ -100,8 +100,8 @@ export const AcademicMegaMenu = () => {
   }
 
   return (
-    <div className="py-4 px-6 w-[920px] max-w-[95vw]">
-      <div className="grid grid-cols-4 gap-8 items-start">
+    <div className="py-4 px-4 w-[800px] max-w-[90vw]">
+      <div className="grid grid-cols-4 gap-4 items-start">
         {/* Academic Information */}
         <div className="py-2">
           <SectionHeader href="/academic">
