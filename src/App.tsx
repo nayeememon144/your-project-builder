@@ -34,6 +34,12 @@ import NoticeDetailPage from "./pages/NoticeDetail";
 import TeacherProfile from "./pages/TeacherProfile";
 import Teachers from "./pages/Teachers";
 import About from "./pages/About";
+import AtAGlance from "./pages/about/AtAGlance";
+import SSTUAct from "./pages/about/SSTUAct";
+import Organogram from "./pages/about/Organogram";
+import Bulletin from "./pages/about/Bulletin";
+import Monogram from "./pages/about/Monogram";
+import CampusMap from "./pages/about/CampusMap";
 import Academic from "./pages/Academic";
 import AcademicCalendar from "./pages/AcademicCalendar";
 import Admission from "./pages/Admission";
@@ -64,7 +70,12 @@ const App = () => (
           <Route path="/notices" element={<NoticesPage />} />
           <Route path="/notices/:id" element={<NoticeDetailPage />} />
           <Route path="/about" element={<About />} />
-          <Route path="/about/*" element={<About />} />
+          <Route path="/about/at-a-glance" element={<AtAGlance />} />
+          <Route path="/about/act" element={<SSTUAct />} />
+          <Route path="/about/organogram" element={<Organogram />} />
+          <Route path="/about/bulletin" element={<Bulletin />} />
+          <Route path="/about/monogram" element={<Monogram />} />
+          <Route path="/about/campus-map" element={<CampusMap />} />
           <Route path="/academic" element={<Academic />} />
           <Route path="/academic/calendar" element={<AcademicCalendar />} />
           <Route path="/academic/*" element={<Academic />} />

@@ -57,9 +57,12 @@ const noticesDropdown = [
 
 const aboutDropdown = [
   { label: 'About SSTU', href: '/about' },
-  { label: 'Faculties', href: '/faculties' },
-  { label: 'Departments', href: '/departments' },
-  { label: 'Teachers', href: '/teachers' },
+  { label: 'At a Glance', href: '/about/at-a-glance' },
+  { label: 'SSTU ACT', href: '/about/act' },
+  { label: 'SSTU Organogram', href: '/about/organogram' },
+  { label: 'SSTU Bulletin', href: '/about/bulletin' },
+  { label: 'SSTU Monogram', href: '/about/monogram' },
+  { label: 'Campus Map', href: '/about/campus-map' },
   { label: 'Photo Gallery', href: '/gallery' },
   { label: 'Contact Us', href: '/contact' },
 ];

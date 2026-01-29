@@ -19,7 +19,11 @@ import {
   Info,
   Image as ImageIcon,
   User,
-  Upload
+  Upload,
+  FileText,
+  Palette,
+  BookOpen,
+  Network
 } from 'lucide-react';
 
 type SiteSetting = {
@@ -36,8 +40,10 @@ const SiteSettingsManagement = () => {
   const queryClient = useQueryClient();
   const glanceImageRef = useRef<HTMLInputElement>(null);
   const vcImageRef = useRef<HTMLInputElement>(null);
+  const organogramImageRef = useRef<HTMLInputElement>(null);
   const [uploadingGlance, setUploadingGlance] = useState(false);
   const [uploadingVC, setUploadingVC] = useState(false);
+  const [uploadingOrganogram, setUploadingOrganogram] = useState(false);
 
   // About/At a Glance settings
   const [aboutSettings, setAboutSettings] = useState({
@@ -69,6 +75,39 @@ const SiteSettingsManagement = () => {
     map_embed_url: '',
   });
 
+  // ACT settings
+  const [actSettings, setActSettings] = useState({
+    description: '',
+    content: '',
+    pdf_url: '',
+  });
+
+  // Organogram settings
+  const [organogramSettings, setOrganogramSettings] = useState({
+    description: '',
+    image_url: '',
+    pdf_url: '',
+  });
+
+  // Bulletin settings
+  const [bulletinSettings, setBulletinSettings] = useState({
+    description: '',
+    bulletins: [] as Array<{ title: string; year: string; pdf_url: string; description?: string }>,
+  });
+
+  // Monogram settings
+  const [monogramSettings, setMonogramSettings] = useState({
+    description: '',
+    logo_meaning: '',
+  });
+
+  // Campus Map settings
+  const [campusMapSettings, setCampusMapSettings] = useState({
+    description: '',
+    map_embed_url: '',
+    google_maps_url: '',
+  });
+
   // Fetch settings
   const { isLoading } = useQuery({
     queryKey: ['site-settings'],
@@ -96,6 +135,36 @@ const SiteSettingsManagement = () => {
         }
         if (setting.setting_key === 'contact' && value) {
           setContactSettings(prev => ({
+            ...prev,
+            ...value,
+          }));
+        }
+        if (setting.setting_key === 'about_act' && value) {
+          setActSettings(prev => ({
+            ...prev,
+            ...value,
+          }));
+        }
+        if (setting.setting_key === 'about_organogram' && value) {
+          setOrganogramSettings(prev => ({
+            ...prev,
+            ...value,
+          }));
+        }
+        if (setting.setting_key === 'about_bulletin' && value) {
+          setBulletinSettings(prev => ({
+            ...prev,
+            ...value,
+          }));
+        }
+        if (setting.setting_key === 'about_monogram' && value) {
+          setMonogramSettings(prev => ({
+            ...prev,
+            ...value,
+          }));
+        }
+        if (setting.setting_key === 'about_campus_map' && value) {
+          setCampusMapSettings(prev => ({
             ...prev,
             ...value,
           }));
@@ -145,7 +214,7 @@ const SiteSettingsManagement = () => {
   // Image upload handler
   const handleImageUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: 'glance' | 'vc'
+    type: 'glance' | 'vc' | 'organogram'
   ) => {
     if (!e.target.files || !e.target.files[0]) return;
     
@@ -154,7 +223,8 @@ const SiteSettingsManagement = () => {
     const fileName = `site-settings/${type}-${Date.now()}.${fileExt}`;
     
     if (type === 'glance') setUploadingGlance(true);
-    else setUploadingVC(true);
+    else if (type === 'vc') setUploadingVC(true);
+    else setUploadingOrganogram(true);
     
     try {
       const { error: uploadError } = await supabase.storage
@@ -169,8 +239,10 @@ const SiteSettingsManagement = () => {
       
       if (type === 'glance') {
         setAboutSettings(prev => ({ ...prev, glance_image: publicUrl }));
-      } else {
+      } else if (type === 'vc') {
         setVCSettings(prev => ({ ...prev, vc_image: publicUrl }));
+      } else {
+        setOrganogramSettings(prev => ({ ...prev, image_url: publicUrl }));
       }
       
       toast({ title: 'Image uploaded successfully' });
@@ -178,7 +250,8 @@ const SiteSettingsManagement = () => {
       toast({ title: 'Failed to upload image', variant: 'destructive' });
     } finally {
       if (type === 'glance') setUploadingGlance(false);
-      else setUploadingVC(false);
+      else if (type === 'vc') setUploadingVC(false);
+      else setUploadingOrganogram(false);
     }
   };
 
@@ -192,6 +265,26 @@ const SiteSettingsManagement = () => {
 
   const handleSaveContact = () => {
     saveMutation.mutate({ key: 'contact', value: contactSettings });
+  };
+
+  const handleSaveAct = () => {
+    saveMutation.mutate({ key: 'about_act', value: actSettings });
+  };
+
+  const handleSaveOrganogram = () => {
+    saveMutation.mutate({ key: 'about_organogram', value: organogramSettings });
+  };
+
+  const handleSaveBulletin = () => {
+    saveMutation.mutate({ key: 'about_bulletin', value: bulletinSettings as unknown as Record<string, string | number | boolean> });
+  };
+
+  const handleSaveMonogram = () => {
+    saveMutation.mutate({ key: 'about_monogram', value: monogramSettings });
+  };
+
+  const handleSaveCampusMap = () => {
+    saveMutation.mutate({ key: 'about_campus_map', value: campusMapSettings });
   };
 
   if (isLoading) {
@@ -214,7 +307,7 @@ const SiteSettingsManagement = () => {
         </div>
 
         <Tabs defaultValue="glance" className="space-y-6">
-          <TabsList>
+          <TabsList className="flex flex-wrap h-auto gap-1">
             <TabsTrigger value="glance" className="gap-2">
               <Info className="w-4 h-4" />
               At a Glance
@@ -230,6 +323,26 @@ const SiteSettingsManagement = () => {
             <TabsTrigger value="contact" className="gap-2">
               <Phone className="w-4 h-4" />
               Contact
+            </TabsTrigger>
+            <TabsTrigger value="act" className="gap-2">
+              <FileText className="w-4 h-4" />
+              ACT
+            </TabsTrigger>
+            <TabsTrigger value="organogram" className="gap-2">
+              <Network className="w-4 h-4" />
+              Organogram
+            </TabsTrigger>
+            <TabsTrigger value="bulletin" className="gap-2">
+              <BookOpen className="w-4 h-4" />
+              Bulletin
+            </TabsTrigger>
+            <TabsTrigger value="monogram" className="gap-2">
+              <Palette className="w-4 h-4" />
+              Monogram
+            </TabsTrigger>
+            <TabsTrigger value="campus-map" className="gap-2">
+              <MapPin className="w-4 h-4" />
+              Campus Map
             </TabsTrigger>
           </TabsList>
 
@@ -572,6 +685,267 @@ const SiteSettingsManagement = () => {
                   {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
                   <Save className="w-4 h-4" />
                   Save Contact Settings
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* ACT Settings */}
+          <TabsContent value="act" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5" />
+                  SSTU ACT
+                </CardTitle>
+                <CardDescription>
+                  Manage the SSTU Act page content and PDF document
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="act_description">Description</Label>
+                  <Textarea
+                    id="act_description"
+                    value={actSettings.description}
+                    onChange={(e) => setActSettings({ ...actSettings, description: e.target.value })}
+                    rows={3}
+                    placeholder="Brief description of the SSTU Act..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="act_content">Key Provisions</Label>
+                  <Textarea
+                    id="act_content"
+                    value={actSettings.content}
+                    onChange={(e) => setActSettings({ ...actSettings, content: e.target.value })}
+                    rows={8}
+                    placeholder="List the key provisions of the Act..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="act_pdf">PDF URL</Label>
+                  <Input
+                    id="act_pdf"
+                    value={actSettings.pdf_url}
+                    onChange={(e) => setActSettings({ ...actSettings, pdf_url: e.target.value })}
+                    placeholder="https://example.com/sstu-act.pdf"
+                  />
+                </div>
+                <Button onClick={handleSaveAct} disabled={saveMutation.isPending} className="gap-2">
+                  {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  <Save className="w-4 h-4" />
+                  Save ACT Settings
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Organogram Settings */}
+          <TabsContent value="organogram" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Network className="w-5 h-5" />
+                  SSTU Organogram
+                </CardTitle>
+                <CardDescription>
+                  Manage the organizational structure diagram
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="organogram_description">Description</Label>
+                  <Textarea
+                    id="organogram_description"
+                    value={organogramSettings.description}
+                    onChange={(e) => setOrganogramSettings({ ...organogramSettings, description: e.target.value })}
+                    rows={3}
+                    placeholder="Description of the organizational structure..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Organogram Image</Label>
+                  <div className="flex items-start gap-4">
+                    <div className="w-48 h-32 bg-muted rounded-lg overflow-hidden border">
+                      {organogramSettings.image_url ? (
+                        <img 
+                          src={organogramSettings.image_url} 
+                          alt="Organogram" 
+                          className="w-full h-full object-contain"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          <Network className="w-8 h-8" />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={organogramImageRef}
+                        onChange={(e) => handleImageUpload(e, 'organogram')}
+                        className="hidden"
+                      />
+                      <Button 
+                        variant="outline" 
+                        onClick={() => organogramImageRef.current?.click()}
+                        disabled={uploadingOrganogram}
+                      >
+                        {uploadingOrganogram ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <Upload className="w-4 h-4 mr-2" />
+                        )}
+                        Upload Image
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="organogram_pdf">PDF URL (Optional)</Label>
+                  <Input
+                    id="organogram_pdf"
+                    value={organogramSettings.pdf_url}
+                    onChange={(e) => setOrganogramSettings({ ...organogramSettings, pdf_url: e.target.value })}
+                    placeholder="https://example.com/organogram.pdf"
+                  />
+                </div>
+                <Button onClick={handleSaveOrganogram} disabled={saveMutation.isPending} className="gap-2">
+                  {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  <Save className="w-4 h-4" />
+                  Save Organogram Settings
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Bulletin Settings */}
+          <TabsContent value="bulletin" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5" />
+                  SSTU Bulletin
+                </CardTitle>
+                <CardDescription>
+                  Manage university bulletins and academic publications
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="bulletin_description">Description</Label>
+                  <Textarea
+                    id="bulletin_description"
+                    value={bulletinSettings.description}
+                    onChange={(e) => setBulletinSettings({ ...bulletinSettings, description: e.target.value })}
+                    rows={3}
+                    placeholder="Description of the SSTU Bulletin..."
+                  />
+                </div>
+                <div className="border rounded-lg p-4 bg-muted/50">
+                  <p className="text-sm text-muted-foreground">
+                    Note: For complex bulletin management with multiple entries, please contact the development team to set up the bulletins array in the database.
+                  </p>
+                </div>
+                <Button onClick={handleSaveBulletin} disabled={saveMutation.isPending} className="gap-2">
+                  {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  <Save className="w-4 h-4" />
+                  Save Bulletin Settings
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Monogram Settings */}
+          <TabsContent value="monogram" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Palette className="w-5 h-5" />
+                  SSTU Monogram
+                </CardTitle>
+                <CardDescription>
+                  Manage the official logo and visual identity information
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="monogram_description">Description</Label>
+                  <Textarea
+                    id="monogram_description"
+                    value={monogramSettings.description}
+                    onChange={(e) => setMonogramSettings({ ...monogramSettings, description: e.target.value })}
+                    rows={3}
+                    placeholder="Description of the SSTU monogram and its significance..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="logo_meaning">Symbolism & Meaning</Label>
+                  <Textarea
+                    id="logo_meaning"
+                    value={monogramSettings.logo_meaning}
+                    onChange={(e) => setMonogramSettings({ ...monogramSettings, logo_meaning: e.target.value })}
+                    rows={6}
+                    placeholder="Explain the symbolism and meaning of the logo elements..."
+                  />
+                </div>
+                <Button onClick={handleSaveMonogram} disabled={saveMutation.isPending} className="gap-2">
+                  {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  <Save className="w-4 h-4" />
+                  Save Monogram Settings
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Campus Map Settings */}
+          <TabsContent value="campus-map" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="w-5 h-5" />
+                  Campus Map
+                </CardTitle>
+                <CardDescription>
+                  Manage campus location and map settings
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="campus_description">Description</Label>
+                  <Textarea
+                    id="campus_description"
+                    value={campusMapSettings.description}
+                    onChange={(e) => setCampusMapSettings({ ...campusMapSettings, description: e.target.value })}
+                    rows={3}
+                    placeholder="Description of the campus location..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="campus_map_embed">Google Maps Embed URL</Label>
+                  <Textarea
+                    id="campus_map_embed"
+                    value={campusMapSettings.map_embed_url}
+                    onChange={(e) => setCampusMapSettings({ ...campusMapSettings, map_embed_url: e.target.value })}
+                    rows={2}
+                    placeholder="https://www.google.com/maps/embed?..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="google_maps_url">Google Maps Link (for directions)</Label>
+                  <Input
+                    id="google_maps_url"
+                    value={campusMapSettings.google_maps_url}
+                    onChange={(e) => setCampusMapSettings({ ...campusMapSettings, google_maps_url: e.target.value })}
+                    placeholder="https://goo.gl/maps/..."
+                  />
+                </div>
+                <Button onClick={handleSaveCampusMap} disabled={saveMutation.isPending} className="gap-2">
+                  {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  <Save className="w-4 h-4" />
+                  Save Campus Map Settings
                 </Button>
               </CardContent>
             </Card>
