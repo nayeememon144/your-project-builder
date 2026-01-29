@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      academic_calendar_events: {
+        Row: {
+          academic_year: string | null
+          created_at: string
+          description: string | null
+          display_order: number | null
+          end_date: string | null
+          event_type: string
+          id: string
+          is_active: boolean | null
+          semester: string | null
+          start_date: string
+          title: string
+          title_bn: string | null
+          updated_at: string
+        }
+        Insert: {
+          academic_year?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          event_type?: string
+          id?: string
+          is_active?: boolean | null
+          semester?: string | null
+          start_date: string
+          title: string
+          title_bn?: string | null
+          updated_at?: string
+        }
+        Update: {
+          academic_year?: string | null
+          created_at?: string
+          description?: string | null
+          display_order?: number | null
+          end_date?: string | null
+          event_type?: string
+          id?: string
+          is_active?: boolean | null
+          semester?: string | null
+          start_date?: string
+          title?: string
+          title_bn?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       departments: {
         Row: {
           code: string | null
