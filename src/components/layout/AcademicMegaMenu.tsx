@@ -15,6 +15,12 @@ interface Department {
   short_name: string | null;
 }
 
+interface Program {
+  id: string;
+  name: string;
+  degree_type: string;
+}
+
 const academicInfoItems = [
   { label: 'Academic Calendars', href: '/academic/calendar' },
   { label: 'Undergraduate Program', href: '/academic/undergraduate' },
@@ -25,12 +31,13 @@ const academicInfoItems = [
 export const AcademicMegaMenu = () => {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [facultiesRes, departmentsRes] = await Promise.all([
+        const [facultiesRes, departmentsRes, programsRes] = await Promise.all([
           supabase
             .from('faculties')
             .select('id, name, short_name')
@@ -41,10 +48,16 @@ export const AcademicMegaMenu = () => {
             .select('id, name, short_name')
             .eq('is_active', true)
             .order('display_order', { ascending: true }),
+          supabase
+            .from('programs')
+            .select('id, name, degree_type')
+            .eq('is_active', true)
+            .order('name', { ascending: true }),
         ]);
 
         if (facultiesRes.data) setFaculties(facultiesRes.data);
         if (departmentsRes.data) setDepartments(departmentsRes.data);
+        if (programsRes.data) setPrograms(programsRes.data);
       } catch (error) {
         console.error('Error fetching academic data:', error);
       } finally {
@@ -58,7 +71,7 @@ export const AcademicMegaMenu = () => {
   const MenuItem = ({ href, label }: { href: string; label: string }) => (
     <Link
       to={href}
-      className="flex items-center gap-2 py-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+      className="flex items-center gap-2 py-1 text-sm text-muted-foreground hover:text-primary transition-colors"
     >
       <ChevronRight className="w-3 h-3 text-gold flex-shrink-0" />
       <span className="leading-tight">{label}</span>
@@ -68,7 +81,7 @@ export const AcademicMegaMenu = () => {
   const SectionHeader = ({ href, children }: { href: string; children: React.ReactNode }) => (
     <Link
       to={href}
-      className="block text-base font-bold text-primary hover:text-gold transition-colors border-b-2 border-gold pb-2 mb-3"
+      className="block text-sm font-bold text-primary hover:text-gold transition-colors border-b border-gold pb-1.5 mb-2"
     >
       {children}
     </Link>
@@ -76,25 +89,20 @@ export const AcademicMegaMenu = () => {
 
   if (loading) {
     return (
-      <div className="py-8 px-6 flex justify-center">
+      <div className="w-[600px] py-8 flex justify-center">
         <Loader2 className="w-5 h-5 animate-spin text-primary" />
       </div>
     );
   }
 
-  // Split departments into two columns
-  const midPoint = Math.ceil(departments.length / 2);
-  const leftDepartments = departments.slice(0, midPoint);
-  const rightDepartments = departments.slice(midPoint);
-
   return (
-    <div className="py-5 px-6">
-      {/* Top Row: Academic Information + Faculties (side by side) */}
-      <div className="grid grid-cols-2 gap-8 pb-5 border-b border-border">
+    <div className="w-[600px] p-5">
+      {/* Row 1: Academic Information + Faculties */}
+      <div className="grid grid-cols-2 gap-6 pb-4 border-b border-border">
         {/* Academic Information */}
-        <div className="border-l-4 border-gold pl-4">
+        <div>
           <SectionHeader href="/academic">Academic Information</SectionHeader>
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {academicInfoItems.map((item, idx) => (
               <MenuItem key={idx} href={item.href} label={item.label} />
             ))}
@@ -102,10 +110,10 @@ export const AcademicMegaMenu = () => {
         </div>
 
         {/* Faculties */}
-        <div className="border-l-4 border-gold pl-4">
+        <div>
           <SectionHeader href="/faculties">Faculties</SectionHeader>
           {faculties.length > 0 ? (
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {faculties.map((faculty) => (
                 <MenuItem
                   key={faculty.id}
@@ -120,33 +128,61 @@ export const AcademicMegaMenu = () => {
         </div>
       </div>
 
-      {/* Bottom Row: Departments (2 columns) */}
-      <div className="pt-5 border-l-4 border-gold pl-4">
-        <SectionHeader href="/departments">Departments</SectionHeader>
-        {departments.length > 0 ? (
-          <div className="grid grid-cols-2 gap-x-8">
-            <div className="space-y-1">
-              {leftDepartments.map((dept) => (
+      {/* Row 2: Departments + Programs */}
+      <div className="grid grid-cols-2 gap-6 pt-4">
+        {/* Departments */}
+        <div>
+          <SectionHeader href="/departments">Departments</SectionHeader>
+          {departments.length > 0 ? (
+            <div className="space-y-0.5">
+              {departments.slice(0, 6).map((dept) => (
                 <MenuItem
                   key={dept.id}
                   href={`/departments/${dept.short_name?.toLowerCase() || dept.id}`}
                   label={dept.name}
                 />
               ))}
+              {departments.length > 6 && (
+                <Link
+                  to="/departments"
+                  className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-primary hover:text-gold transition-colors"
+                >
+                  View all departments
+                  <ChevronRight className="w-3 h-3" />
+                </Link>
+              )}
             </div>
-            <div className="space-y-1">
-              {rightDepartments.map((dept) => (
+          ) : (
+            <div className="text-sm text-muted-foreground">No departments available</div>
+          )}
+        </div>
+
+        {/* Programs */}
+        <div>
+          <SectionHeader href="/academic">Programs</SectionHeader>
+          {programs.length > 0 ? (
+            <div className="space-y-0.5">
+              {programs.slice(0, 6).map((program) => (
                 <MenuItem
-                  key={dept.id}
-                  href={`/departments/${dept.short_name?.toLowerCase() || dept.id}`}
-                  label={dept.name}
+                  key={program.id}
+                  href={`/programs/${program.id}`}
+                  label={program.name}
                 />
               ))}
+              {programs.length > 6 && (
+                <Link
+                  to="/academic"
+                  className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-primary hover:text-gold transition-colors"
+                >
+                  View all programs
+                  <ChevronRight className="w-3 h-3" />
+                </Link>
+              )}
             </div>
-          </div>
-        ) : (
-          <div className="text-sm text-muted-foreground">No departments available</div>
-        )}
+          ) : (
+            <div className="text-sm text-muted-foreground">No programs available</div>
+          )}
+        </div>
       </div>
     </div>
   );
