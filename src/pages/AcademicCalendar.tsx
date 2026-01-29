@@ -87,10 +87,10 @@ const AcademicCalendar = () => {
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Academic Year:</span>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-40 bg-background">
                   <SelectValue placeholder="All Years" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={4} className="bg-background z-50">
                   <SelectItem value="all">All Years</SelectItem>
                   {academicYears.map(year => (
                     <SelectItem key={year} value={year}>{year}</SelectItem>
@@ -101,10 +101,10 @@ const AcademicCalendar = () => {
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium">Event Type:</span>
               <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger className="w-44">
+                <SelectTrigger className="w-44 bg-background">
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" sideOffset={4} className="bg-background z-50">
                   <SelectItem value="all">All Types</SelectItem>
                   {Object.entries(eventTypeConfig).map(([key, config]) => (
                     <SelectItem key={key} value={key}>{config.label}</SelectItem>
