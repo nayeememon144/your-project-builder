@@ -915,6 +915,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_stats: { Args: never; Returns: Json }
       get_user_role: {
         Args: never
         Returns: Database["public"]["Enums"]["app_role"]
