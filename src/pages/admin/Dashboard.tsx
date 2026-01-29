@@ -38,59 +38,30 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      // Fetch basic counts
-      const [
-        { count: noticeCount },
-        { count: deptCount },
-        { count: facultyCount },
-      ] = await Promise.all([
-        supabase.from('notices').select('*', { count: 'exact', head: true }),
-        supabase.from('departments').select('*', { count: 'exact', head: true }).eq('is_active', true),
-        supabase.from('faculties').select('*', { count: 'exact', head: true }).eq('is_active', true),
-      ]);
-
-      // Fetch user counts by role (two-step query to avoid join issues)
-      const { data: studentRoles } = await supabase
-        .from('user_roles')
-        .select('user_id')
-        .eq('role', 'student');
+      // Use the security definer function to get accurate counts
+      const { data: publicStats, error: statsError } = await supabase.rpc('get_public_stats');
       
-      const { data: teacherRoles } = await supabase
-        .from('user_roles')
-        .select('user_id')
-        .eq('role', 'teacher');
+      // Fetch notice count separately
+      const { count: noticeCount } = await supabase
+        .from('notices')
+        .select('*', { count: 'exact', head: true });
 
-      // Count active profiles for each role
-      let studentCount = 0;
-      let teacherCount = 0;
-
-      if (studentRoles && studentRoles.length > 0) {
-        const studentUserIds = studentRoles.map(r => r.user_id);
-        const { count } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .in('user_id', studentUserIds)
-          .eq('is_active', true);
-        studentCount = count || 0;
+      if (!statsError && publicStats) {
+        const stats = publicStats as {
+          departments: number;
+          faculties: number;
+          students: number;
+          teachers: number;
+          all_teachers: number;
+        };
+        setStats({
+          totalNotices: noticeCount || 0,
+          totalDepartments: stats.departments || 0,
+          totalFaculties: stats.faculties || 0,
+          totalStudents: stats.students || 0,
+          totalTeachers: stats.teachers || 0, // Shows verified teachers count (17)
+        });
       }
-
-      if (teacherRoles && teacherRoles.length > 0) {
-        const teacherUserIds = teacherRoles.map(r => r.user_id);
-        const { count } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .in('user_id', teacherUserIds)
-          .eq('is_active', true);
-        teacherCount = count || 0;
-      }
-
-      setStats({
-        totalNotices: noticeCount || 0,
-        totalDepartments: deptCount || 0,
-        totalFaculties: facultyCount || 0,
-        totalStudents: studentCount,
-        totalTeachers: teacherCount,
-      });
     };
 
     fetchStats();
@@ -107,7 +78,7 @@ const AdminDashboard = () => {
       color: 'bg-blue-500',
     },
     {
-      title: 'Total Teachers',
+      title: 'Verified Teachers',
       value: stats.totalTeachers,
       icon: Users,
       change: '+3',

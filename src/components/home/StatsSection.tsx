@@ -52,63 +52,18 @@ export const StatsSection = () => {
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
-  // Fetch dynamic stats from database
+  // Fetch dynamic stats from database using security definer function
   const { data: dynamicStats } = useQuery({
     queryKey: ['public-stats'],
     queryFn: async () => {
-      // Fetch basic counts in parallel
-      const [
-        { count: facultyCount },
-        { count: deptCount },
-      ] = await Promise.all([
-        supabase.from('faculties').select('*', { count: 'exact', head: true }).eq('is_active', true),
-        supabase.from('departments').select('*', { count: 'exact', head: true }).eq('is_active', true),
-      ]);
-
-      // Fetch user role counts
-      const { data: studentRoles } = await supabase
-        .from('user_roles')
-        .select('user_id')
-        .eq('role', 'student');
-      
-      const { data: teacherRoles } = await supabase
-        .from('user_roles')
-        .select('user_id')
-        .eq('role', 'teacher');
-
-      // Count active verified teachers
-      let teacherCount = 0;
-      if (teacherRoles && teacherRoles.length > 0) {
-        const teacherUserIds = teacherRoles.map(r => r.user_id);
-        const { count } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .in('user_id', teacherUserIds)
-          .eq('is_active', true)
-          .eq('is_verified', true);
-        teacherCount = count || 0;
-      }
-
-      // Count active students
-      let studentCount = 0;
-      if (studentRoles && studentRoles.length > 0) {
-        const studentUserIds = studentRoles.map(r => r.user_id);
-        const { count } = await supabase
-          .from('profiles')
-          .select('*', { count: 'exact', head: true })
-          .in('user_id', studentUserIds)
-          .eq('is_active', true);
-        studentCount = count || 0;
-      }
-
-      return {
-        faculties: facultyCount || 0,
-        departments: deptCount || 0,
-        students: studentCount,
-        teachers: teacherCount,
-        graduates: 0, // Can be managed via site_settings in future
-        institutes: 0, // Can be managed via site_settings in future
-        staffs: 27, // Can be managed via site_settings in future
+      const { data, error } = await supabase.rpc('get_public_stats');
+      if (error) throw error;
+      return data as {
+        faculties: number;
+        departments: number;
+        teachers: number;
+        students: number;
+        all_teachers: number;
       };
     },
   });
@@ -117,10 +72,10 @@ export const StatsSection = () => {
     { icon: Building2, value: dynamicStats?.faculties || 0, label: 'Faculties', color: 'text-blue-500' },
     { icon: BookOpen, value: dynamicStats?.departments || 0, label: 'Departments', color: 'text-green-500' },
     { icon: GraduationCap, value: dynamicStats?.students || 0, label: 'Students', color: 'text-orange-500' },
-    { icon: Award, value: dynamicStats?.graduates || 0, label: 'Graduates', color: 'text-purple-500' },
-    { icon: Building2, value: dynamicStats?.institutes || 0, label: 'Institutes', color: 'text-pink-500' },
+    { icon: Award, value: 0, label: 'Graduates', color: 'text-purple-500' },
+    { icon: Building2, value: 0, label: 'Institutes', color: 'text-pink-500' },
     { icon: Users, value: dynamicStats?.teachers || 0, label: 'Teachers', color: 'text-cyan-500' },
-    { icon: Briefcase, value: dynamicStats?.staffs || 0, label: 'Staffs', color: 'text-amber-500' },
+    { icon: Briefcase, value: 27, label: 'Staffs', color: 'text-amber-500' },
   ];
 
   return (
