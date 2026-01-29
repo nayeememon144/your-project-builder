@@ -16,6 +16,13 @@ interface Department {
   faculty_id: string | null;
 }
 
+interface Program {
+  id: string;
+  name: string;
+  degree_type: string;
+  department_id: string | null;
+}
+
 const academicInfoItems = [
   { label: 'Academic Calendars', href: '/academic/calendar' },
   { label: 'Undergraduate Program', href: '/academic/undergraduate' },
@@ -25,12 +32,13 @@ const academicInfoItems = [
 export const AcademicMegaMenu = () => {
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [facultiesRes, departmentsRes] = await Promise.all([
+        const [facultiesRes, departmentsRes, programsRes] = await Promise.all([
           supabase
             .from('faculties')
             .select('id, name, short_name')
@@ -43,10 +51,17 @@ export const AcademicMegaMenu = () => {
             .eq('is_active', true)
             .order('display_order', { ascending: true })
             .limit(6),
+          supabase
+            .from('programs')
+            .select('id, name, degree_type, department_id')
+            .eq('is_active', true)
+            .order('name', { ascending: true })
+            .limit(8),
         ]);
 
         if (facultiesRes.data) setFaculties(facultiesRes.data);
         if (departmentsRes.data) setDepartments(departmentsRes.data);
+        if (programsRes.data) setPrograms(programsRes.data);
       } catch (error) {
         console.error('Error fetching academic data:', error);
       } finally {
@@ -77,7 +92,7 @@ export const AcademicMegaMenu = () => {
 
   return (
     <div className="py-1">
-      <div className="grid grid-cols-3 divide-x divide-gray-100">
+      <div className="grid grid-cols-4 divide-x divide-gray-100">
         {/* Academic Information */}
         <div className="py-1">
           <div className="px-4 py-1.5 text-sm font-semibold text-primary">
@@ -124,6 +139,27 @@ export const AcademicMegaMenu = () => {
             <div className="px-4 py-1.5 text-sm text-gray-400">No departments</div>
           )}
           <MenuItem href="/departments" label="View All →" />
+        </div>
+
+        {/* Programs */}
+        <div className="py-1">
+          <div className="px-4 py-1.5 text-sm font-semibold text-primary">
+            Programs
+          </div>
+          {programs.length > 0 ? (
+            programs.slice(0, 5).map((program) => (
+              <MenuItem 
+                key={program.id}
+                href={`/programs/${program.id}`} 
+                label={program.name} 
+              />
+            ))
+          ) : (
+            <div className="px-4 py-1.5 text-sm text-gray-400">No programs</div>
+          )}
+          {programs.length > 5 && (
+            <MenuItem href="/programs" label="View All →" />
+          )}
         </div>
       </div>
     </div>
