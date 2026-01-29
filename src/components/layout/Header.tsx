@@ -240,7 +240,7 @@ export const Header = () => {
                     )}
                   </AnimatePresence>
 
-                  {/* Academic Mega Menu - Positioned under Academics button */}
+                  {/* Academic Mega Menu - Centered under navigation */}
                   <AnimatePresence>
                     {activeDropdown === 'Academics' && item.hasMegaMenu && (
                       <motion.div
@@ -248,8 +248,7 @@ export const Header = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -5 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute left-0 top-full bg-white rounded-b-lg shadow-xl z-50"
-                        style={{ minWidth: '580px' }}
+                        className="fixed left-1/2 -translate-x-1/2 top-[104px] bg-white rounded-b-lg shadow-xl z-50"
                       >
                         <AcademicMegaMenu />
                       </motion.div>
