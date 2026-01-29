@@ -43,6 +43,12 @@ import Faculties from "./pages/Faculties";
 import Contact from "./pages/Contact";
 import Gallery from "./pages/Gallery";
 import ProgramDetail from "./pages/ProgramDetail";
+import Events from "./pages/Events";
+import DSW from "./pages/facilities/DSW";
+import Halls from "./pages/facilities/Halls";
+import Organizations from "./pages/facilities/Organizations";
+import EResources from "./pages/facilities/EResources";
+import Library from "./pages/facilities/Library";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 const queryClient = new QueryClient();
@@ -73,10 +79,18 @@ const App = () => (
           <Route path="/contact" element={<Contact />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/programs/:id" element={<ProgramDetail />} />
-          <Route path="/events" element={<NoticesPage />} />
-          <Route path="/downloads" element={<NoticesPage />} />
-          <Route path="/faq" element={<About />} />
+          <Route path="/events" element={<Events />} />
+          
+          {/* Facilities Routes */}
+          <Route path="/facilities/dsw" element={<DSW />} />
+          <Route path="/facilities/halls" element={<Halls />} />
+          <Route path="/facilities/organizations" element={<Organizations />} />
+          <Route path="/facilities/e-resources" element={<EResources />} />
+          <Route path="/facilities/e-resources/*" element={<EResources />} />
+          <Route path="/facilities/library" element={<Library />} />
           <Route path="/facilities/*" element={<About />} />
+          
+          <Route path="/faq" element={<About />} />
           <Route path="/centers/*" element={<Research />} />
           <Route path="/institutes/*" element={<Academic />} />
           
