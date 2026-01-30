@@ -94,30 +94,45 @@ const TeachersManagement = () => {
     profile_photo: '',
   });
 
-  // Fetch teachers with their role (two-step query since no FK between profiles and user_roles)
+  // Fetch teachers - includes both users with teacher role AND profiles with teacher designations
   const { data: teachers, isLoading: teachersLoading } = useQuery({
     queryKey: ['admin-teachers'],
     queryFn: async () => {
-      // First get all teacher user_ids
+      // Get user_ids of users with teacher role
       const { data: teacherRoles, error: rolesError } = await supabase
         .from('user_roles')
         .select('user_id')
         .eq('role', 'teacher');
       
       if (rolesError) throw rolesError;
-      if (!teacherRoles || teacherRoles.length === 0) return [];
       
-      const teacherUserIds = teacherRoles.map(r => r.user_id);
+      const teacherUserIds = teacherRoles?.map(r => r.user_id) || [];
       
-      // Then fetch profiles for those users
+      // Fetch all profiles that are either:
+      // 1. Users with teacher role, OR
+      // 2. Profiles with teacher-like designations (for faculty without auth accounts)
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .in('user_id', teacherUserIds)
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data as TeacherProfile[];
+      
+      // Filter to include teachers by role OR by designation
+      const teacherDesignations = ['professor', 'lecturer', 'dean', 'chairman', 'assistant professor', 'associate professor'];
+      
+      const filtered = data?.filter(p => {
+        // Include if user has teacher role
+        if (p.user_id && teacherUserIds.includes(p.user_id)) return true;
+        // Include if has teacher-like designation
+        if (p.designation) {
+          const desigLower = p.designation.toLowerCase();
+          return teacherDesignations.some(d => desigLower.includes(d));
+        }
+        return false;
+      }) || [];
+      
+      return filtered as TeacherProfile[];
     },
   });
 
