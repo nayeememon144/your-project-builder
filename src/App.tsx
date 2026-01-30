@@ -45,6 +45,7 @@ import AcademicCalendar from "./pages/AcademicCalendar";
 import Admission from "./pages/Admission";
 import Research from "./pages/Research";
 import Departments from "./pages/Departments";
+import DepartmentDetail from "./pages/DepartmentDetail";
 import Faculties from "./pages/Faculties";
 import Contact from "./pages/Contact";
 import Gallery from "./pages/Gallery";
@@ -84,7 +85,7 @@ const App = () => (
           <Route path="/research" element={<Research />} />
           <Route path="/research/*" element={<Research />} />
           <Route path="/departments" element={<Departments />} />
-          <Route path="/departments/*" element={<Departments />} />
+          <Route path="/departments/:slug" element={<DepartmentDetail />} />
           <Route path="/faculties" element={<Faculties />} />
           <Route path="/faculties/*" element={<Faculties />} />
           <Route path="/contact" element={<Contact />} />

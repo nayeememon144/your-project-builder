@@ -74,6 +74,8 @@ export type Database = {
           established_year: number | null
           faculty_id: string | null
           head_id: string | null
+          head_message: string | null
+          head_message_bn: string | null
           id: string
           is_active: boolean | null
           mission: string | null
@@ -81,6 +83,9 @@ export type Database = {
           name_bn: string | null
           office_location: string | null
           short_name: string | null
+          syllabus_content: string | null
+          syllabus_content_bn: string | null
+          syllabus_pdf_url: string | null
           updated_at: string
           vision: string | null
           website_url: string | null
@@ -96,6 +101,8 @@ export type Database = {
           established_year?: number | null
           faculty_id?: string | null
           head_id?: string | null
+          head_message?: string | null
+          head_message_bn?: string | null
           id?: string
           is_active?: boolean | null
           mission?: string | null
@@ -103,6 +110,9 @@ export type Database = {
           name_bn?: string | null
           office_location?: string | null
           short_name?: string | null
+          syllabus_content?: string | null
+          syllabus_content_bn?: string | null
+          syllabus_pdf_url?: string | null
           updated_at?: string
           vision?: string | null
           website_url?: string | null
@@ -118,6 +128,8 @@ export type Database = {
           established_year?: number | null
           faculty_id?: string | null
           head_id?: string | null
+          head_message?: string | null
+          head_message_bn?: string | null
           id?: string
           is_active?: boolean | null
           mission?: string | null
@@ -125,6 +137,9 @@ export type Database = {
           name_bn?: string | null
           office_location?: string | null
           short_name?: string | null
+          syllabus_content?: string | null
+          syllabus_content_bn?: string | null
+          syllabus_pdf_url?: string | null
           updated_at?: string
           vision?: string | null
           website_url?: string | null

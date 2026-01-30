@@ -37,7 +37,15 @@ interface Department {
   code: string | null;
   description: string | null;
   description_bn: string | null;
+  vision: string | null;
+  mission: string | null;
   faculty_id: string | null;
+  head_id: string | null;
+  head_message: string | null;
+  head_message_bn: string | null;
+  syllabus_content: string | null;
+  syllabus_content_bn: string | null;
+  syllabus_pdf_url: string | null;
   contact_email: string | null;
   contact_phone: string | null;
   office_location: string | null;
@@ -66,7 +74,15 @@ const DepartmentsManagement = () => {
     code: '',
     description: '',
     description_bn: '',
+    vision: '',
+    mission: '',
     faculty_id: '',
+    head_id: '',
+    head_message: '',
+    head_message_bn: '',
+    syllabus_content: '',
+    syllabus_content_bn: '',
+    syllabus_pdf_url: '',
     contact_email: '',
     contact_phone: '',
     office_location: '',
@@ -117,7 +133,15 @@ const DepartmentsManagement = () => {
       code: formData.code || null,
       description: formData.description || null,
       description_bn: formData.description_bn || null,
+      vision: formData.vision || null,
+      mission: formData.mission || null,
       faculty_id: formData.faculty_id || null,
+      head_id: formData.head_id || null,
+      head_message: formData.head_message || null,
+      head_message_bn: formData.head_message_bn || null,
+      syllabus_content: formData.syllabus_content || null,
+      syllabus_content_bn: formData.syllabus_content_bn || null,
+      syllabus_pdf_url: formData.syllabus_pdf_url || null,
       contact_email: formData.contact_email || null,
       contact_phone: formData.contact_phone || null,
       office_location: formData.office_location || null,
@@ -177,7 +201,15 @@ const DepartmentsManagement = () => {
       code: department.code || '',
       description: department.description || '',
       description_bn: department.description_bn || '',
+      vision: department.vision || '',
+      mission: department.mission || '',
       faculty_id: department.faculty_id || '',
+      head_id: department.head_id || '',
+      head_message: department.head_message || '',
+      head_message_bn: department.head_message_bn || '',
+      syllabus_content: department.syllabus_content || '',
+      syllabus_content_bn: department.syllabus_content_bn || '',
+      syllabus_pdf_url: department.syllabus_pdf_url || '',
       contact_email: department.contact_email || '',
       contact_phone: department.contact_phone || '',
       office_location: department.office_location || '',
@@ -197,7 +229,15 @@ const DepartmentsManagement = () => {
       code: '',
       description: '',
       description_bn: '',
+      vision: '',
+      mission: '',
       faculty_id: '',
+      head_id: '',
+      head_message: '',
+      head_message_bn: '',
+      syllabus_content: '',
+      syllabus_content_bn: '',
+      syllabus_pdf_url: '',
       contact_email: '',
       contact_phone: '',
       office_location: '',
@@ -321,39 +361,132 @@ const DepartmentsManagement = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="contact_email">Contact Email</Label>
-                    <Input
-                      id="contact_email"
-                      type="email"
-                      value={formData.contact_email}
-                      onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
-                      placeholder="dept@sstu.ac.bd"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="contact_phone">Contact Phone</Label>
-                    <Input
-                      id="contact_phone"
-                      value={formData.contact_phone}
-                      onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
-                      placeholder="+880-XXX-XXXXXXX"
-                    />
-                  </div>
-                </div>
-
                 <div className="space-y-2">
-                  <Label htmlFor="office_location">Office Location</Label>
-                  <Input
-                    id="office_location"
-                    value={formData.office_location}
-                    onChange={(e) => setFormData({ ...formData, office_location: e.target.value })}
-                    placeholder="Building A, Room 101"
+                  <Label htmlFor="description_bn">Description (Bengali)</Label>
+                  <Textarea
+                    id="description_bn"
+                    rows={3}
+                    value={formData.description_bn}
+                    onChange={(e) => setFormData({ ...formData, description_bn: e.target.value })}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="vision">Vision</Label>
+                    <Textarea
+                      id="vision"
+                      rows={2}
+                      value={formData.vision}
+                      onChange={(e) => setFormData({ ...formData, vision: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="mission">Mission</Label>
+                    <Textarea
+                      id="mission"
+                      rows={2}
+                      value={formData.mission}
+                      onChange={(e) => setFormData({ ...formData, mission: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-semibold mb-4">Department Head Message</h4>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="head_message">Head Message (English)</Label>
+                      <Textarea
+                        id="head_message"
+                        rows={4}
+                        value={formData.head_message}
+                        onChange={(e) => setFormData({ ...formData, head_message: e.target.value })}
+                        placeholder="Welcome message from the department head..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="head_message_bn">Head Message (Bengali)</Label>
+                      <Textarea
+                        id="head_message_bn"
+                        rows={4}
+                        value={formData.head_message_bn}
+                        onChange={(e) => setFormData({ ...formData, head_message_bn: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-semibold mb-4">Academic Syllabus</h4>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="syllabus_pdf_url">Syllabus PDF URL</Label>
+                      <Input
+                        id="syllabus_pdf_url"
+                        value={formData.syllabus_pdf_url}
+                        onChange={(e) => setFormData({ ...formData, syllabus_pdf_url: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="syllabus_content">Syllabus Content (English)</Label>
+                      <Textarea
+                        id="syllabus_content"
+                        rows={4}
+                        value={formData.syllabus_content}
+                        onChange={(e) => setFormData({ ...formData, syllabus_content: e.target.value })}
+                        placeholder="Course structure, credit hours, semester breakdown..."
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="syllabus_content_bn">Syllabus Content (Bengali)</Label>
+                      <Textarea
+                        id="syllabus_content_bn"
+                        rows={4}
+                        value={formData.syllabus_content_bn}
+                        onChange={(e) => setFormData({ ...formData, syllabus_content_bn: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4 mt-4">
+                  <h4 className="font-semibold mb-4">Contact Information</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="contact_email">Contact Email</Label>
+                      <Input
+                        id="contact_email"
+                        type="email"
+                        value={formData.contact_email}
+                        onChange={(e) => setFormData({ ...formData, contact_email: e.target.value })}
+                        placeholder="dept@sstu.ac.bd"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="contact_phone">Contact Phone</Label>
+                      <Input
+                        id="contact_phone"
+                        value={formData.contact_phone}
+                        onChange={(e) => setFormData({ ...formData, contact_phone: e.target.value })}
+                        placeholder="+880-XXX-XXXXXXX"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 mt-4">
+                    <Label htmlFor="office_location">Office Location</Label>
+                    <Input
+                      id="office_location"
+                      value={formData.office_location}
+                      onChange={(e) => setFormData({ ...formData, office_location: e.target.value })}
+                      placeholder="Building A, Room 101"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 border-t pt-4 mt-4">
                   <div className="space-y-2">
                     <Label htmlFor="display_order">Display Order</Label>
                     <Input
