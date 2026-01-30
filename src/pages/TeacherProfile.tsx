@@ -40,17 +40,17 @@ const TeacherProfile = () => {
   const { data: publications, isLoading: pubsLoading } = useQuery({
     queryKey: ['teacher-publications', id],
     queryFn: async () => {
-      if (!profile?.user_id) return [];
+      if (!id) return [];
       const { data, error } = await supabase
         .from('research_papers')
         .select('*')
-        .eq('teacher_id', profile.user_id)
+        .eq('teacher_id', id)
         .eq('status', 'published')
         .order('publication_date', { ascending: false });
       if (error) throw error;
       return data;
     },
-    enabled: !!profile?.user_id,
+    enabled: !!id,
   });
 
   if (profileLoading) {
