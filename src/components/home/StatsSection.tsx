@@ -52,6 +52,20 @@ export const StatsSection = () => {
   const containerRef = useRef(null);
   const isInView = useInView(containerRef, { once: true, margin: "-100px" });
 
+  // Fetch quick_stats from database (admin-editable values)
+  const { data: quickStats } = useQuery({
+    queryKey: ['quick-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('quick_stats')
+        .select('*')
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
   // Fetch dynamic stats from database using security definer function
   const { data: dynamicStats } = useQuery({
     queryKey: ['public-stats'],
@@ -68,14 +82,22 @@ export const StatsSection = () => {
     },
   });
 
+  // Helper to get stat value: prefer quick_stats, then fallback to dynamic
+  const getQuickStatValue = (label: string, dynamicValue: number) => {
+    const quickStat = quickStats?.find(s => 
+      s.label.toLowerCase() === label.toLowerCase()
+    );
+    return quickStat?.value ?? dynamicValue;
+  };
+
   const stats: StatItem[] = [
     { icon: Building2, value: dynamicStats?.faculties || 0, label: 'Faculties', color: 'text-blue-500' },
     { icon: BookOpen, value: dynamicStats?.departments || 0, label: 'Departments', color: 'text-green-500' },
-    { icon: GraduationCap, value: dynamicStats?.students || 0, label: 'Students', color: 'text-orange-500' },
-    { icon: Award, value: 0, label: 'Graduates', color: 'text-purple-500' },
-    { icon: Building2, value: 0, label: 'Institutes', color: 'text-pink-500' },
+    { icon: GraduationCap, value: getQuickStatValue('Students', dynamicStats?.students || 0), label: 'Students', color: 'text-orange-500' },
+    { icon: Award, value: getQuickStatValue('Graduates', 0), label: 'Graduates', color: 'text-purple-500' },
+    { icon: Building2, value: getQuickStatValue('Institutes', 0), label: 'Institutes', color: 'text-pink-500' },
     { icon: Users, value: dynamicStats?.teachers || 0, label: 'Teachers', color: 'text-cyan-500' },
-    { icon: Briefcase, value: 27, label: 'Staffs', color: 'text-amber-500' },
+    { icon: Briefcase, value: getQuickStatValue('Staffs', 27), label: 'Staffs', color: 'text-amber-500' },
   ];
 
   return (
