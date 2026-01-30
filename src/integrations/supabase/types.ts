@@ -627,7 +627,7 @@ export type Database = {
           session: string | null
           student_id: string | null
           updated_at: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           academic_background?: string | null
@@ -656,7 +656,7 @@ export type Database = {
           session?: string | null
           student_id?: string | null
           updated_at?: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           academic_background?: string | null
@@ -685,7 +685,7 @@ export type Database = {
           session?: string | null
           student_id?: string | null
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
