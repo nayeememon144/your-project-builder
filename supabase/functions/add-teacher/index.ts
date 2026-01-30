@@ -100,9 +100,13 @@ Deno.serve(async (req) => {
 
     if (createError) {
       console.error('Create user error:', createError)
+      // Return a user-friendly error message for duplicate email
+      const errorMessage = createError.message.includes('already been registered') 
+        ? `A teacher with email "${email}" already exists. Please use a different email address.`
+        : createError.message;
       return new Response(
-        JSON.stringify({ success: false, error: createError.message }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ success: false, error: errorMessage }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
