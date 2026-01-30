@@ -101,22 +101,26 @@ export const QuickStatsSection = () => {
   });
 
   // Merge database stats with dynamic counts
+  // Priority: quick_stats table > dynamic counts
   const stats = quickStats?.map(stat => {
     let value = stat.value;
     
-    // Override with dynamic counts for specific labels
-    if (stat.label.toLowerCase().includes('department') && counts?.departments) {
+    // For specific labels, use quick_stats value if set, otherwise fall back to dynamic
+    // Students and custom stats: use quick_stats value directly (admin-editable)
+    // Other stats: prefer dynamic counts for accuracy
+    if (stat.label.toLowerCase().includes('student')) {
+      // Students use quick_stats value (admin can override)
+      value = stat.value;
+    } else if (stat.label.toLowerCase().includes('department') && counts?.departments) {
       value = counts.departments;
     } else if (stat.label.toLowerCase().includes('facult') && counts?.faculties) {
       value = counts.faculties;
     } else if (stat.label.toLowerCase().includes('program') && counts?.programs) {
       value = counts.programs;
-    } else if (stat.label.toLowerCase().includes('teacher')) {
-      value = counts?.teachers || stat.value;
-    } else if (stat.label.toLowerCase().includes('student')) {
-      value = counts?.students || stat.value;
-    } else if (stat.label.toLowerCase().includes('research')) {
-      value = counts?.research || stat.value;
+    } else if (stat.label.toLowerCase().includes('teacher') && counts?.teachers) {
+      value = counts.teachers;
+    } else if (stat.label.toLowerCase().includes('research') && counts?.research) {
+      value = counts.research;
     }
 
     const IconComponent = stat.icon && iconMap[stat.icon] ? iconMap[stat.icon] : Building2;

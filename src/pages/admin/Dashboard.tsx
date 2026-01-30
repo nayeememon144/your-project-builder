@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,6 +15,8 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
+import { EditableStatCard } from '@/components/admin/EditableStatCard';
 
 interface StatCard {
   title: string;
@@ -25,80 +26,98 @@ interface StatCard {
   changeType?: 'positive' | 'negative';
   href: string;
   color: string;
+  statKey: string;
+  isEditable: boolean;
 }
 
 const AdminDashboard = () => {
-  const [stats, setStats] = useState({
-    totalStudents: 0,
-    totalTeachers: 0,
-    totalNotices: 0,
-    totalDepartments: 0,
-    totalFaculties: 0,
+  // Fetch quick_stats from database (admin-editable values)
+  const { data: quickStats } = useQuery({
+    queryKey: ['admin-quick-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('quick_stats')
+        .select('*')
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      return data;
+    },
   });
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      // Use the security definer function to get accurate counts
-      const { data: publicStats, error: statsError } = await supabase.rpc('get_public_stats');
-      
-      // Fetch notice count separately
+  // Fetch dynamic counts from database
+  const { data: stats } = useQuery({
+    queryKey: ['admin-dashboard-stats'],
+    queryFn: async () => {
+      const { data: publicStats } = await supabase.rpc('get_public_stats');
       const { count: noticeCount } = await supabase
         .from('notices')
         .select('*', { count: 'exact', head: true });
 
-      if (!statsError && publicStats) {
-        const stats = publicStats as {
-          departments: number;
-          faculties: number;
-          students: number;
-          teachers: number;
-          all_teachers: number;
-        };
-        setStats({
-          totalNotices: noticeCount || 0,
-          totalDepartments: stats.departments || 0,
-          totalFaculties: stats.faculties || 0,
-          totalStudents: stats.students || 0,
-          totalTeachers: stats.teachers || 0, // Shows verified teachers count (17)
-        });
-      }
-    };
+      const dbStats = publicStats as {
+        departments: number;
+        faculties: number;
+        students: number;
+        teachers: number;
+        all_teachers: number;
+      } | null;
 
-    fetchStats();
-  }, []);
+      return {
+        totalNotices: noticeCount || 0,
+        totalDepartments: dbStats?.departments || 0,
+        totalFaculties: dbStats?.faculties || 0,
+        totalStudents: dbStats?.students || 0,
+        totalTeachers: dbStats?.teachers || 0,
+      };
+    },
+  });
+
+  // Get quick_stats value for a key, or fallback to dynamic count
+  const getStatValue = (key: string, dynamicValue: number) => {
+    const quickStat = quickStats?.find(s => s.label === key);
+    return quickStat?.value ?? dynamicValue;
+  };
 
   const statCards: StatCard[] = [
     {
       title: 'Total Students',
-      value: stats.totalStudents,
+      value: getStatValue('Students', stats?.totalStudents || 0),
       icon: GraduationCap,
       change: '+12%',
       changeType: 'positive',
       href: '/admin/students',
       color: 'bg-blue-500',
+      statKey: 'Students',
+      isEditable: true,
     },
     {
       title: 'Verified Teachers',
-      value: stats.totalTeachers,
+      value: stats?.totalTeachers || 0,
       icon: Users,
       change: '+3',
       changeType: 'positive',
       href: '/admin/teachers',
       color: 'bg-green-500',
+      statKey: 'Teachers',
+      isEditable: false, // Dynamic count from verified teachers
     },
     {
       title: 'Total Notices',
-      value: stats.totalNotices,
+      value: stats?.totalNotices || 0,
       icon: Bell,
       href: '/admin/notices',
       color: 'bg-orange-500',
+      statKey: 'Notices',
+      isEditable: false, // Dynamic count
     },
     {
       title: 'Departments',
-      value: stats.totalDepartments,
+      value: stats?.totalDepartments || 0,
       icon: Building2,
       href: '/admin/departments',
       color: 'bg-purple-500',
+      statKey: 'Departments',
+      isEditable: false, // Dynamic count
     },
   ];
 
@@ -136,27 +155,42 @@ const AdminDashboard = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statCards.map((stat, idx) => (
-            <Link key={idx} to={stat.href}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">{stat.title}</p>
-                      <p className="text-3xl font-bold text-foreground">{stat.value}</p>
-                      {stat.change && (
-                        <p className={`text-sm mt-1 ${stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'}`}>
-                          <TrendingUp className="w-3 h-3 inline mr-1" />
-                          {stat.change} from last month
-                        </p>
-                      )}
+            stat.isEditable ? (
+              <EditableStatCard
+                key={idx}
+                title={stat.title}
+                value={Number(stat.value)}
+                icon={stat.icon}
+                change={stat.change}
+                changeType={stat.changeType}
+                href={stat.href}
+                color={stat.color}
+                statKey={stat.statKey}
+                isEditable={stat.isEditable}
+              />
+            ) : (
+              <Link key={idx} to={stat.href}>
+                <Card className="hover:shadow-lg transition-shadow cursor-pointer">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-muted-foreground mb-1">{stat.title}</p>
+                        <p className="text-3xl font-bold text-foreground">{stat.value}</p>
+                        {stat.change && (
+                          <p className={`text-sm mt-1 ${stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'}`}>
+                            <TrendingUp className="w-3 h-3 inline mr-1" />
+                            {stat.change} from last month
+                          </p>
+                        )}
+                      </div>
+                      <div className={`w-14 h-14 rounded-xl ${stat.color} flex items-center justify-center`}>
+                        <stat.icon className="w-7 h-7 text-white" />
+                      </div>
                     </div>
-                    <div className={`w-14 h-14 rounded-xl ${stat.color} flex items-center justify-center`}>
-                      <stat.icon className="w-7 h-7 text-white" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+                  </CardContent>
+                </Card>
+              </Link>
+            )
           ))}
         </div>
 

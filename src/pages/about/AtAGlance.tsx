@@ -1,7 +1,17 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Users, BookOpen, Building2, GraduationCap, Award, Briefcase } from 'lucide-react';
+import { Users, BookOpen, Building2, GraduationCap, Award, Briefcase, Globe } from 'lucide-react';
+
+const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
+  GraduationCap,
+  Users,
+  Building2,
+  BookOpen,
+  Award,
+  Globe,
+  Briefcase,
+};
 
 const AtAGlance = () => {
   const { data: settings } = useQuery({
@@ -22,6 +32,22 @@ const AtAGlance = () => {
     },
   });
 
+  // Fetch quick_stats from database (admin-editable)
+  const { data: quickStats } = useQuery({
+    queryKey: ['quick-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('quick_stats')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch dynamic counts as fallback
   const { data: dbStats } = useQuery({
     queryKey: ['public-stats'],
     queryFn: async () => {
@@ -45,13 +71,21 @@ Sunamgonj Science and Technology University (SSTU), established in 2020, current
   const description = settings?.description || defaultDescription;
   const image = settings?.image || 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80';
 
+  // Helper to get stat value: prefer quick_stats, then fallback to dynamic
+  const getStatValue = (label: string, dynamicValue: number) => {
+    const quickStat = quickStats?.find(s => 
+      s.label.toLowerCase() === label.toLowerCase()
+    );
+    return quickStat?.value?.toString() ?? dynamicValue.toString();
+  };
+
   const stats = [
     { icon: Building2, value: dbStats?.faculties?.toString() || '2', label: 'Faculties' },
     { icon: BookOpen, value: dbStats?.departments?.toString() || '4', label: 'Departments' },
-    { icon: GraduationCap, value: dbStats?.students?.toString() || '320', label: 'Students' },
+    { icon: GraduationCap, value: getStatValue('Students', dbStats?.students || 0), label: 'Students' },
     { icon: Users, value: dbStats?.teachers?.toString() || '17', label: 'Teachers' },
-    { icon: Award, value: '0', label: 'Graduates' },
-    { icon: Briefcase, value: '27', label: 'Staffs' },
+    { icon: Award, value: getStatValue('Graduates', 0), label: 'Graduates' },
+    { icon: Briefcase, value: getStatValue('Staffs', 27), label: 'Staffs' },
   ];
 
   return (
