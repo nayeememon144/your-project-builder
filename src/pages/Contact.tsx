@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import { MapPin, Phone, Mail, Clock, Building2, Send, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,28 +19,17 @@ const contactSchema = z.object({
   message: z.string().trim().min(10, "Message must be at least 10 characters").max(2000),
 });
 
-const contactInfo = [
-  {
-    icon: MapPin,
-    title: 'Address',
-    details: ['Sunamgonj Science and Technology University', 'Shantiganj 3000, Sunamganj, Bangladesh'],
-  },
-  {
-    icon: Phone,
-    title: 'Phone',
-    details: ['+880-831-52012', '+880-831-52013'],
-  },
-  {
-    icon: Mail,
-    title: 'Email',
-    details: ['info@sstu.ac.bd', 'admission@sstu.ac.bd'],
-  },
-  {
-    icon: Clock,
-    title: 'Office Hours',
-    details: ['Sunday - Thursday', '9:00 AM - 5:00 PM'],
-  },
-];
+// Default contact info (fallback)
+const defaultContactSettings = {
+  address: 'Shantiganj 3000, Sunamganj, Bangladesh',
+  city: 'Sunamgonj Sadar, Sylhet Division',
+  phone1: '+880-831-52012',
+  phone2: '+880-831-52013',
+  email1: 'info@sstu.ac.bd',
+  email2: 'admission@sstu.ac.bd',
+  office_hours: 'Sunday - Thursday, 9:00 AM - 5:00 PM',
+  map_embed_url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3619.1234567890123!2d91.39892961500789!3d24.86621398404831!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x375058ba92ad11f1%3A0xba7d98d1e1b1b1b1!2sSunamganj%20Science%20and%20Technology%20University!5e0!3m2!1sen!2sbd!4v1706370000000!5m2!1sen!2sbd',
+};
 
 const departmentContacts = [
   {
@@ -85,6 +76,47 @@ const Contact = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Fetch contact settings from database
+  const { data: contactSettings } = useQuery({
+    queryKey: ['site-settings-contact'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'contact')
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data?.setting_value as typeof defaultContactSettings | null;
+    },
+  });
+
+  const contact = contactSettings || defaultContactSettings;
+
+  // Build contact info from settings
+  const contactInfo = [
+    {
+      icon: MapPin,
+      title: 'Address',
+      details: ['Sunamgonj Science and Technology University', contact.address],
+    },
+    {
+      icon: Phone,
+      title: 'Phone',
+      details: [contact.phone1, contact.phone2].filter(Boolean),
+    },
+    {
+      icon: Mail,
+      title: 'Email',
+      details: [contact.email1, contact.email2].filter(Boolean),
+    },
+    {
+      icon: Clock,
+      title: 'Office Hours',
+      details: contact.office_hours ? contact.office_hours.split(', ') : ['Sunday - Thursday', '9:00 AM - 5:00 PM'],
+    },
+  ];
+
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -122,8 +154,7 @@ const Contact = () => {
     });
   };
 
-  // SSTU coordinates from user-provided link
-  const mapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3619.1234567890123!2d91.39892961500789!3d24.86621398404831!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x375058ba92ad11f1%3A0xba7d98d1e1b1b1b1!2sSunamganj%20Science%20and%20Technology%20University!5e0!3m2!1sen!2sbd!4v1706370000000!5m2!1sen!2sbd";
+  const mapEmbedUrl = contact.map_embed_url || defaultContactSettings.map_embed_url;
 
   return (
     <MainLayout>
