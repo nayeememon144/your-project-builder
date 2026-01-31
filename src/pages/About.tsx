@@ -1,9 +1,30 @@
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Building2, Target, Eye, Award, Users, BookOpen, GraduationCap, Briefcase } from 'lucide-react';
+import { Building2, Target, Eye, Users, BookOpen, GraduationCap } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
 const About = () => {
+  // Fetch about settings from site_settings
+  const { data: aboutSettings } = useQuery({
+    queryKey: ['site-settings-about'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'about')
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data?.setting_value as { 
+        history?: string; 
+        vision?: string;
+        mission?: string;
+        established_year?: string;
+        glance_image?: string;
+      } | null;
+    },
+  });
+
   // Fetch quick_stats from database (admin-editable values)
   const { data: quickStats } = useQuery({
     queryKey: ['quick-stats'],
@@ -41,6 +62,27 @@ const About = () => {
     return quickStat?.value ?? dynamicValue;
   };
 
+  // Default content
+  const defaultHistory = `Sunamgonj Science and Technology University (SSTU) was established in 2020 
+with the vision of becoming a leading institution in science and technology 
+education in Bangladesh.
+
+Located in the beautiful district of Sunamgonj, the university is committed 
+to providing quality education and fostering research and innovation.`;
+
+  const defaultVision = `To become a world-class university that produces skilled graduates, 
+conducts cutting-edge research, and contributes to the socio-economic 
+development of Bangladesh.`;
+
+  const defaultMission = `To provide quality education, promote research and innovation, 
+develop skilled human resources, and serve the community through 
+knowledge dissemination and outreach programs.`;
+
+  const history = aboutSettings?.history || defaultHistory;
+  const vision = aboutSettings?.vision || defaultVision;
+  const mission = aboutSettings?.mission || defaultMission;
+  const glanceImage = aboutSettings?.glance_image || 'https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80';
+
   const stats = [
     { icon: GraduationCap, value: getQuickStatValue('Students', dynamicStats?.students || 0), label: 'Students' },
     { icon: BookOpen, value: dynamicStats?.departments || 0, label: 'Departments' },
@@ -70,19 +112,15 @@ const About = () => {
               <h2 className="font-display text-3xl font-bold text-foreground mb-6">
                 Our History
               </h2>
-              <p className="text-muted-foreground mb-4">
-                Sunamgonj Science and Technology University (SSTU) was established in 2020 
-                with the vision of becoming a leading institution in science and technology 
-                education in Bangladesh.
-              </p>
-              <p className="text-muted-foreground">
-                Located in the beautiful district of Sunamgonj, the university is committed 
-                to providing quality education and fostering research and innovation.
-              </p>
+              {history.split('\n\n').map((paragraph, idx) => (
+                <p key={idx} className="text-muted-foreground mb-4">
+                  {paragraph}
+                </p>
+              ))}
             </div>
             <div className="bg-muted rounded-xl p-8">
               <img 
-                src="https://images.unsplash.com/photo-1562774053-701939374585?w=800&q=80" 
+                src={glanceImage} 
                 alt="SSTU Campus" 
                 className="rounded-lg w-full"
               />
@@ -96,10 +134,8 @@ const About = () => {
                 <Eye className="w-6 h-6 text-accent" />
               </div>
               <h3 className="font-display text-2xl font-bold mb-4">Our Vision</h3>
-              <p className="text-muted-foreground">
-                To become a world-class university that produces skilled graduates, 
-                conducts cutting-edge research, and contributes to the socio-economic 
-                development of Bangladesh.
+              <p className="text-muted-foreground whitespace-pre-line">
+                {vision}
               </p>
             </div>
             <div className="bg-card rounded-xl p-8 border">
@@ -107,10 +143,8 @@ const About = () => {
                 <Target className="w-6 h-6 text-gold" />
               </div>
               <h3 className="font-display text-2xl font-bold mb-4">Our Mission</h3>
-              <p className="text-muted-foreground">
-                To provide quality education, promote research and innovation, 
-                develop skilled human resources, and serve the community through 
-                knowledge dissemination and outreach programs.
+              <p className="text-muted-foreground whitespace-pre-line">
+                {mission}
               </p>
             </div>
           </div>
