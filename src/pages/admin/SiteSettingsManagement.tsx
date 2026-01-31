@@ -23,7 +23,8 @@ import {
   FileText,
   Palette,
   BookOpen,
-  Network
+  Network,
+  Video
 } from 'lucide-react';
 
 type SiteSetting = {
@@ -108,6 +109,16 @@ const SiteSettingsManagement = () => {
     google_maps_url: '',
   });
 
+  // Campus Life settings
+  const [campusLifeSettings, setCampusLifeSettings] = useState({
+    video_url: '',
+    video_thumbnail: '',
+    background_image: '',
+    title: 'The Campus Life',
+    description: '',
+    description_2: '',
+  });
+
   // Fetch settings
   const { isLoading } = useQuery({
     queryKey: ['site-settings'],
@@ -165,6 +176,12 @@ const SiteSettingsManagement = () => {
         }
         if (setting.setting_key === 'about_campus_map' && value) {
           setCampusMapSettings(prev => ({
+            ...prev,
+            ...value,
+          }));
+        }
+        if (setting.setting_key === 'campus_life' && value) {
+          setCampusLifeSettings(prev => ({
             ...prev,
             ...value,
           }));
@@ -287,6 +304,10 @@ const SiteSettingsManagement = () => {
     saveMutation.mutate({ key: 'about_campus_map', value: campusMapSettings });
   };
 
+  const handleSaveCampusLife = () => {
+    saveMutation.mutate({ key: 'campus_life', value: campusLifeSettings });
+  };
+
   if (isLoading) {
     return (
       <AdminLayout>
@@ -343,6 +364,10 @@ const SiteSettingsManagement = () => {
             <TabsTrigger value="campus-map" className="gap-2">
               <MapPin className="w-4 h-4" />
               Campus Map
+            </TabsTrigger>
+            <TabsTrigger value="campus-life" className="gap-2">
+              <Video className="w-4 h-4" />
+              Campus Life
             </TabsTrigger>
           </TabsList>
 
@@ -946,6 +971,90 @@ const SiteSettingsManagement = () => {
                   {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
                   <Save className="w-4 h-4" />
                   Save Campus Map Settings
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Campus Life Settings */}
+          <TabsContent value="campus-life" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Video className="w-5 h-5" />
+                  Campus Life Section
+                </CardTitle>
+                <CardDescription>
+                  Manage the Campus Life section on the homepage with video and content
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="campus_life_title">Section Title</Label>
+                  <Input
+                    id="campus_life_title"
+                    value={campusLifeSettings.title}
+                    onChange={(e) => setCampusLifeSettings({ ...campusLifeSettings, title: e.target.value })}
+                    placeholder="The Campus Life"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="campus_life_video">YouTube Video URL</Label>
+                  <Input
+                    id="campus_life_video"
+                    value={campusLifeSettings.video_url}
+                    onChange={(e) => setCampusLifeSettings({ ...campusLifeSettings, video_url: e.target.value })}
+                    placeholder="https://www.youtube.com/watch?v=..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Paste the full YouTube video URL. The embed will be generated automatically.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="campus_life_thumbnail">Video Thumbnail URL (Optional)</Label>
+                  <Input
+                    id="campus_life_thumbnail"
+                    value={campusLifeSettings.video_thumbnail}
+                    onChange={(e) => setCampusLifeSettings({ ...campusLifeSettings, video_thumbnail: e.target.value })}
+                    placeholder="https://example.com/thumbnail.jpg"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Leave empty to use YouTube's default thumbnail
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="campus_life_bg">Background Image URL</Label>
+                  <Input
+                    id="campus_life_bg"
+                    value={campusLifeSettings.background_image}
+                    onChange={(e) => setCampusLifeSettings({ ...campusLifeSettings, background_image: e.target.value })}
+                    placeholder="https://example.com/campus-bg.jpg"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="campus_life_desc">Description Paragraph 1</Label>
+                  <Textarea
+                    id="campus_life_desc"
+                    value={campusLifeSettings.description}
+                    onChange={(e) => setCampusLifeSettings({ ...campusLifeSettings, description: e.target.value })}
+                    rows={3}
+                    placeholder="First paragraph about campus life..."
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="campus_life_desc2">Description Paragraph 2</Label>
+                  <Textarea
+                    id="campus_life_desc2"
+                    value={campusLifeSettings.description_2}
+                    onChange={(e) => setCampusLifeSettings({ ...campusLifeSettings, description_2: e.target.value })}
+                    rows={3}
+                    placeholder="Second paragraph about campus life..."
+                  />
+                </div>
+                <Button onClick={handleSaveCampusLife} disabled={saveMutation.isPending} className="gap-2">
+                  {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  <Save className="w-4 h-4" />
+                  Save Campus Life Settings
                 </Button>
               </CardContent>
             </Card>

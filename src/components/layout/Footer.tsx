@@ -56,6 +56,18 @@ const defaultContact = {
   map_embed_url: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3619.1234567890123!2d91.39892961500789!3d24.86621398404831!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x375058ba92ad11f1%3A0xba7d98d1e1b1b1b1!2sSunamganj%20Science%20and%20Technology%20University!5e0!3m2!1sen!2sbd!4v1706370000000!5m2!1sen!2sbd',
 };
 
+// Helper function to extract URL from iframe HTML or return URL directly
+const extractMapUrl = (input: string | undefined): string => {
+  if (!input) return defaultContact.map_embed_url;
+  // If input contains iframe tag, extract the src URL
+  if (input.includes('<iframe')) {
+    const srcMatch = input.match(/src="([^"]+)"/);
+    return srcMatch ? srcMatch[1] : defaultContact.map_embed_url;
+  }
+  // Return as-is if it's already a URL
+  return input;
+};
+
 export const Footer = () => {
   // Fetch contact settings
   const { data: contactSettings } = useQuery({
@@ -200,8 +212,8 @@ export const Footer = () => {
 
               {/* Map - SSTU Location */}
               <div className="bg-primary-foreground/10 rounded-lg overflow-hidden h-48">
-                <iframe
-                  src={contact.map_embed_url || defaultContact.map_embed_url}
+              <iframe
+                  src={extractMapUrl(contact.map_embed_url)}
                   width="100%"
                   height="100%"
                   style={{ border: 0 }}
