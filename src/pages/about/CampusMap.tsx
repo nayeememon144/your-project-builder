@@ -28,9 +28,22 @@ const CampusMap = () => {
   });
 
   const defaultDescription = `Sunamgonj Science and Technology University is located in Shantiganj, Sunamganj, Bangladesh. The campus is situated alongside the Chittagong-Sylhet Highway, about 25km away from the Sylhet city, offering a serene environment conducive to learning and research.`;
+  const defaultMapEmbedUrl = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.847374583!2d91.39!3d25.06!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sSunamganj%20Science%20and%20Technology%20University!5e0!3m2!1sen!2sbd!4v1234567890';
+
+  // Helper function to extract URL from iframe HTML or return URL directly
+  const extractMapUrl = (input: string | undefined): string => {
+    if (!input) return defaultMapEmbedUrl;
+    // If input contains iframe tag, extract the src URL
+    if (input.includes('<iframe')) {
+      const srcMatch = input.match(/src="([^"]+)"/);
+      return srcMatch ? srcMatch[1] : defaultMapEmbedUrl;
+    }
+    // Return as-is if it's already a URL
+    return input;
+  };
 
   const description = settings?.description || defaultDescription;
-  const mapEmbedUrl = settings?.map_embed_url || 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.847374583!2d91.39!3d25.06!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sSunamganj%20Science%20and%20Technology%20University!5e0!3m2!1sen!2sbd!4v1234567890';
+  const mapEmbedUrl = extractMapUrl(settings?.map_embed_url);
   const campusMapImage = settings?.campus_map_image;
   const campusMapPdf = settings?.campus_map_pdf;
   const googleMapsUrl = settings?.google_maps_url || 'https://goo.gl/maps/sunamganj-sstu';
