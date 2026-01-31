@@ -1,7 +1,53 @@
 import { MainLayout } from '@/components/layout/MainLayout';
-import { Building2, Target, Eye, Award, Users, BookOpen } from 'lucide-react';
+import { Building2, Target, Eye, Award, Users, BookOpen, GraduationCap, Briefcase } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const About = () => {
+  // Fetch quick_stats from database (admin-editable values)
+  const { data: quickStats } = useQuery({
+    queryKey: ['quick-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('quick_stats')
+        .select('*')
+        .eq('is_active', true);
+      
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch dynamic stats from database
+  const { data: dynamicStats } = useQuery({
+    queryKey: ['public-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_public_stats');
+      if (error) throw error;
+      return data as {
+        faculties: number;
+        departments: number;
+        teachers: number;
+        students: number;
+      };
+    },
+  });
+
+  // Helper to get stat value: prefer quick_stats, then fallback to dynamic
+  const getQuickStatValue = (label: string, dynamicValue: number) => {
+    const quickStat = quickStats?.find(s => 
+      s.label.toLowerCase() === label.toLowerCase()
+    );
+    return quickStat?.value ?? dynamicValue;
+  };
+
+  const stats = [
+    { icon: GraduationCap, value: getQuickStatValue('Students', dynamicStats?.students || 0), label: 'Students' },
+    { icon: BookOpen, value: dynamicStats?.departments || 0, label: 'Departments' },
+    { icon: Building2, value: dynamicStats?.faculties || 0, label: 'Faculties' },
+    { icon: Users, value: dynamicStats?.teachers || 0, label: 'Teachers' },
+  ];
+
   return (
     <MainLayout>
       {/* Hero Section */}
@@ -71,12 +117,7 @@ const About = () => {
 
           {/* Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {[
-              { icon: Users, value: '5000+', label: 'Students' },
-              { icon: BookOpen, value: '50+', label: 'Programs' },
-              { icon: Building2, value: '6', label: 'Faculties' },
-              { icon: Award, value: '100+', label: 'Faculty Members' },
-            ].map((stat, idx) => (
+            {stats.map((stat, idx) => (
               <div key={idx} className="text-center p-6 bg-muted/50 rounded-xl">
                 <stat.icon className="w-8 h-8 mx-auto mb-3 text-primary" />
                 <div className="font-display text-3xl font-bold text-primary mb-1">
