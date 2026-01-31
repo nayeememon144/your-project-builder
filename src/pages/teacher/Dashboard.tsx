@@ -31,22 +31,32 @@ const TeacherDashboard = () => {
   const [editingPublication, setEditingPublication] = useState<ResearchPaper | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Get current user's profile
-  const { data: profile, isLoading: profileLoading } = useQuery({
-    queryKey: ['teacher-profile'],
+  // Get current user ID first
+  const { data: currentUser } = useQuery({
+    queryKey: ['current-auth-user'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      return user;
+    },
+    staleTime: 0, // Always refetch to get current user
+  });
+
+  // Get current user's profile - key includes user ID to prevent cache issues
+  const { data: profile, isLoading: profileLoading } = useQuery({
+    queryKey: ['teacher-profile', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
       
       const { data, error } = await supabase
         .from('profiles')
         .select(`*, departments(name, short_name), faculties(name)`)
-        .eq('user_id', user.id)
+        .eq('user_id', currentUser.id)
         .single();
       
       if (error) throw error;
       return data;
     },
+    enabled: !!currentUser?.id,
   });
 
   // Get publications for this teacher
