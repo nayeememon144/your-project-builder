@@ -117,7 +117,7 @@ export const CampusLifeSection = () => {
                 </Button>
               </Link>
               <Link to="/about/campus-map">
-                <Button className="bg-white/15 backdrop-blur-sm text-white border border-white/30 hover:bg-white hover:text-primary font-semibold px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <Button className="bg-white text-primary border border-primary/20 hover:bg-primary hover:text-white font-semibold px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                   Campus Map
                 </Button>
               </Link>
