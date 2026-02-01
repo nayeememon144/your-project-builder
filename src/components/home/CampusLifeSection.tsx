@@ -111,13 +111,13 @@ export const CampusLifeSection = () => {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to="/gallery">
-                <Button className="bg-gold text-primary hover:bg-gold/90 group font-semibold">
+                <Button className="bg-gold text-primary hover:bg-gold/90 group font-semibold px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                   Photo Gallery
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
               <Link to="/about/campus-map">
-                <Button variant="outline" className="border-white text-white hover:bg-white/10">
+                <Button className="bg-white/15 backdrop-blur-sm text-white border border-white/30 hover:bg-white hover:text-primary font-semibold px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                   Campus Map
                 </Button>
               </Link>
