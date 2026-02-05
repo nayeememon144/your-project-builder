@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -78,6 +78,7 @@ const OptimizedHeroImage = ({
 
 export const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Fetch hero slides from database
   const { data: dbSlides } = useQuery({
@@ -114,7 +115,11 @@ export const HeroSection = () => {
   };
 
   return (
-    <section className="relative h-screen overflow-hidden">
+    <section 
+      className="relative h-screen overflow-hidden"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {/* Background Slides - Optimized with lazy loading */}
       {slides.map((slide, index) => {
         const isActive = index === currentSlide;
@@ -176,20 +181,34 @@ export const HeroSection = () => {
       </div>
 
       {/* Navigation Arrows */}
-      <button
-        onClick={prevSlide}
-        className="absolute z-20 left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
-      <button
-        onClick={nextSlide}
-        className="absolute z-20 right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
+      <AnimatePresence>
+        {isHovered && (
+          <>
+            <motion.button
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+              onClick={prevSlide}
+              className="absolute z-20 left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all"
+              aria-label="Previous slide"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </motion.button>
+            <motion.button
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+              onClick={nextSlide}
+              className="absolute z-20 right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all"
+              aria-label="Next slide"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </motion.button>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Slide Indicators */}
       <div className="absolute z-20 bottom-24 left-1/2 -translate-x-1/2 flex gap-3">
