@@ -39,7 +39,7 @@ export const BackToTopButton = () => {
             damping: 20 
           }}
           onClick={scrollToTop}
-          className="fixed bottom-8 right-8 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-colors flex items-center justify-center group"
+          className="fixed bottom-8 right-8 z-50 w-12 h-12 rounded-md bg-accent text-accent-foreground shadow-lg hover:bg-accent/90 transition-colors flex items-center justify-center group"
           aria-label="Back to top"
         >
           <ArrowUp className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform" />
