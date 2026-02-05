@@ -1,25 +1,21 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Play, ArrowRight, X } from 'lucide-react';
+import { Play, ArrowRight, X, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 // Default settings
 const defaultSettings = {
   title: 'The Campus Life',
-  description: `SSTU is endowed with a beautiful campus spread over 50 acres of lush green 
-    landscape. The campus provides a serene and peaceful environment conducive 
-    to learning and research activities.`,
-  description_2: `The university offers a vibrant campus life with various cultural, sports, 
-    and academic activities. Students can participate in numerous clubs and 
-    organizations that cater to diverse interests, from technology and innovation 
-    to arts and culture.`,
+  description: `Campus Life at SSTU is more than just an academic journey; it's a vibrant mosaic of experiences, interactions, and personal growth. From rigorous academic pursuits to extracurricular engagements, the campus thrives with diversity and opportunities for students to flourish. With a rich blend of cultural exchange, innovative initiatives, and a supportive community, SSTU's campus life nurtures not only academic excellence but also the development of well-rounded individuals equipped to thrive in a dynamic world.`,
+  description_2: `Every step within our campus resonates with camaraderie, exploration, and the forging of lifelong connections. Establishing clear rules and guidelines at the onset is fundamental to creating a structured and productive environment.`,
   video_url: '',
   video_thumbnail: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=80',
-  background_image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=1920&q=80',
+  background_image: '',
+  campus_image: 'https://images.unsplash.com/photo-1562774053-701939374585?w=1200&q=80',
 };
 
 // Helper to extract YouTube video ID
@@ -50,80 +46,91 @@ export const CampusLifeSection = () => {
 
   const content = settings || defaultSettings;
   const videoId = getYouTubeId(content.video_url || '');
-  const thumbnail = content.video_thumbnail || 
-    (videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : defaultSettings.video_thumbnail);
-  const backgroundImage = content.background_image || defaultSettings.background_image;
+  const campusImage = (content as any).campus_image || content.video_thumbnail || 
+    (videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : defaultSettings.campus_image);
 
   return (
-    <section className="py-16 relative overflow-hidden">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url('${backgroundImage}')`,
-        }}
-      />
-      <div className="absolute inset-0 bg-primary/80" />
+    <section className="relative overflow-hidden bg-background">
+      <div className="grid lg:grid-cols-2 min-h-[600px]">
+        {/* Left Side - Image with Play Button */}
+        <motion.div
+          initial={{ opacity: 0, x: -30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="relative group cursor-pointer min-h-[400px] lg:min-h-full"
+          onClick={() => videoId && setVideoOpen(true)}
+        >
+          {/* Campus Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url('${campusImage}')` }}
+          />
+          
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-black/40" />
 
-      <div className="container mx-auto relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          {/* Video Thumbnail */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="relative group cursor-pointer"
-            onClick={() => videoId && setVideoOpen(true)}
-          >
-            <div className="aspect-video rounded-xl overflow-hidden shadow-2xl">
-              <img
-                src={thumbnail}
-                alt="Campus Life Video"
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              {/* Play Button */}
-              {videoId && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition-colors">
-                  <div className="w-20 h-20 rounded-full bg-gold flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
-                    <Play className="w-8 h-8 text-primary fill-primary ml-1" />
+          {/* Play Button - Centered */}
+          {videoId && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <motion.div 
+                className="relative"
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* Outer ring with animation */}
+                <div className="absolute inset-0 w-24 h-24 rounded-full bg-white/30 animate-ping" style={{ animationDuration: '2s' }} />
+                
+                {/* Main play button */}
+                <div className="relative w-24 h-24 rounded-full bg-white shadow-2xl flex items-center justify-center group-hover:bg-primary transition-colors duration-300">
+                  <div className="w-16 h-16 rounded-full bg-primary flex items-center justify-center group-hover:bg-white transition-colors duration-300">
+                    <Play className="w-7 h-7 text-white fill-white group-hover:text-primary group-hover:fill-primary ml-1 transition-colors duration-300" />
                   </div>
                 </div>
-              )}
+              </motion.div>
             </div>
-          </motion.div>
+          )}
+          
+          {/* No video placeholder */}
+          {!videoId && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-white/60 text-center">
+                <ImageIcon className="w-16 h-16 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">Campus Life</p>
+              </div>
+            </div>
+          )}
+        </motion.div>
 
-          {/* Content */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-white mb-6">
-              {content.title || defaultSettings.title}
-            </h2>
-            <p className="text-white/90 leading-relaxed mb-4">
-              {content.description || defaultSettings.description}
-            </p>
-            <p className="text-white/80 leading-relaxed mb-6">
-              {content.description_2 || defaultSettings.description_2}
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link to="/gallery">
-                <Button className="bg-gold text-primary hover:bg-gold/90 group font-semibold px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                  Photo Gallery
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link to="/about/campus-map">
-                <Button className="bg-white text-primary border border-primary/20 hover:bg-primary hover:text-white font-semibold px-6 py-2.5 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                  Campus Map
-                </Button>
-              </Link>
-            </div>
-          </motion.div>
-        </div>
+        {/* Right Side - Content */}
+        <motion.div
+          initial={{ opacity: 0, x: 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="flex flex-col justify-center px-8 py-12 lg:px-16 lg:py-16 bg-background"
+        >
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-8">
+            {content.title || defaultSettings.title}
+          </h2>
+          
+          <p className="text-muted-foreground leading-relaxed mb-6 text-base lg:text-lg">
+            {content.description || defaultSettings.description}
+          </p>
+          
+          <p className="text-muted-foreground/80 leading-relaxed mb-8 text-base lg:text-lg">
+            {content.description_2 || defaultSettings.description_2}
+          </p>
+          
+          <div>
+            <Link to="/about">
+              <Button className="bg-primary text-primary-foreground hover:bg-primary/90 group font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 text-base">
+                Find out more
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+          </div>
+        </motion.div>
       </div>
 
       {/* Video Modal */}
