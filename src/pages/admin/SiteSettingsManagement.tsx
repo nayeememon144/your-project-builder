@@ -45,6 +45,8 @@ const SiteSettingsManagement = () => {
   const [uploadingGlance, setUploadingGlance] = useState(false);
   const [uploadingVC, setUploadingVC] = useState(false);
   const [uploadingOrganogram, setUploadingOrganogram] = useState(false);
+  const [uploadingCampusLife, setUploadingCampusLife] = useState(false);
+  const campusLifeImageRef = useRef<HTMLInputElement>(null);
 
   // About/At a Glance settings
   const [aboutSettings, setAboutSettings] = useState({
@@ -113,7 +115,7 @@ const SiteSettingsManagement = () => {
   const [campusLifeSettings, setCampusLifeSettings] = useState({
     video_url: '',
     video_thumbnail: '',
-    background_image: '',
+    campus_image: '',
     title: 'The Campus Life',
     description: '',
     description_2: '',
@@ -231,7 +233,7 @@ const SiteSettingsManagement = () => {
   // Image upload handler
   const handleImageUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
-    type: 'glance' | 'vc' | 'organogram'
+    type: 'glance' | 'vc' | 'organogram' | 'campus_life'
   ) => {
     if (!e.target.files || !e.target.files[0]) return;
     
@@ -241,7 +243,8 @@ const SiteSettingsManagement = () => {
     
     if (type === 'glance') setUploadingGlance(true);
     else if (type === 'vc') setUploadingVC(true);
-    else setUploadingOrganogram(true);
+    else if (type === 'organogram') setUploadingOrganogram(true);
+    else setUploadingCampusLife(true);
     
     try {
       const { error: uploadError } = await supabase.storage
@@ -258,8 +261,10 @@ const SiteSettingsManagement = () => {
         setAboutSettings(prev => ({ ...prev, glance_image: publicUrl }));
       } else if (type === 'vc') {
         setVCSettings(prev => ({ ...prev, vc_image: publicUrl }));
-      } else {
+      } else if (type === 'organogram') {
         setOrganogramSettings(prev => ({ ...prev, image_url: publicUrl }));
+      } else {
+        setCampusLifeSettings(prev => ({ ...prev, campus_image: publicUrl }));
       }
       
       toast({ title: 'Image uploaded successfully' });
@@ -268,7 +273,8 @@ const SiteSettingsManagement = () => {
     } finally {
       if (type === 'glance') setUploadingGlance(false);
       else if (type === 'vc') setUploadingVC(false);
-      else setUploadingOrganogram(false);
+      else if (type === 'organogram') setUploadingOrganogram(false);
+      else setUploadingCampusLife(false);
     }
   };
 
@@ -989,6 +995,51 @@ const SiteSettingsManagement = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Campus Image Upload */}
+                <div className="space-y-2">
+                  <Label>Campus Life Image</Label>
+                  <div className="flex items-start gap-4">
+                    <div className="w-64 h-40 bg-muted rounded-lg overflow-hidden border">
+                      {campusLifeSettings.campus_image ? (
+                        <img 
+                          src={campusLifeSettings.campus_image} 
+                          alt="Campus Life" 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          <ImageIcon className="w-8 h-8" />
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        ref={campusLifeImageRef}
+                        onChange={(e) => handleImageUpload(e, 'campus_life')}
+                        className="hidden"
+                      />
+                      <Button 
+                        variant="outline" 
+                        onClick={() => campusLifeImageRef.current?.click()}
+                        disabled={uploadingCampusLife}
+                      >
+                        {uploadingCampusLife ? (
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                          <Upload className="w-4 h-4 mr-2" />
+                        )}
+                        Upload Image
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Recommended: 1200x800px, JPG/PNG<br />
+                        This image appears on the left side with the play button overlay
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="campus_life_title">Section Title</Label>
                   <Input
@@ -1007,29 +1058,8 @@ const SiteSettingsManagement = () => {
                     placeholder="https://www.youtube.com/watch?v=..."
                   />
                   <p className="text-xs text-muted-foreground">
-                    Paste the full YouTube video URL. The embed will be generated automatically.
+                    Paste the full YouTube video URL. When set, a play button will appear on the image to open the video modal.
                   </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="campus_life_thumbnail">Video Thumbnail URL (Optional)</Label>
-                  <Input
-                    id="campus_life_thumbnail"
-                    value={campusLifeSettings.video_thumbnail}
-                    onChange={(e) => setCampusLifeSettings({ ...campusLifeSettings, video_thumbnail: e.target.value })}
-                    placeholder="https://example.com/thumbnail.jpg"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Leave empty to use YouTube's default thumbnail
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="campus_life_bg">Background Image URL</Label>
-                  <Input
-                    id="campus_life_bg"
-                    value={campusLifeSettings.background_image}
-                    onChange={(e) => setCampusLifeSettings({ ...campusLifeSettings, background_image: e.target.value })}
-                    placeholder="https://example.com/campus-bg.jpg"
-                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="campus_life_desc">Description Paragraph 1</Label>
@@ -1037,7 +1067,7 @@ const SiteSettingsManagement = () => {
                     id="campus_life_desc"
                     value={campusLifeSettings.description}
                     onChange={(e) => setCampusLifeSettings({ ...campusLifeSettings, description: e.target.value })}
-                    rows={3}
+                    rows={5}
                     placeholder="First paragraph about campus life..."
                   />
                 </div>
@@ -1047,7 +1077,7 @@ const SiteSettingsManagement = () => {
                     id="campus_life_desc2"
                     value={campusLifeSettings.description_2}
                     onChange={(e) => setCampusLifeSettings({ ...campusLifeSettings, description_2: e.target.value })}
-                    rows={3}
+                    rows={4}
                     placeholder="Second paragraph about campus life..."
                   />
                 </div>
