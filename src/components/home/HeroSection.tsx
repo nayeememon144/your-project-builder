@@ -76,6 +76,11 @@ const OptimizedHeroImage = ({
   );
 };
 
+interface HeroContent {
+  welcome_text?: string;
+  tagline?: string;
+}
+
 export const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -95,7 +100,23 @@ export const HeroSection = () => {
     },
   });
 
+  const { data: heroContent } = useQuery({
+    queryKey: ['hero-content'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('setting_value')
+        .eq('setting_key', 'hero_content')
+        .maybeSingle();
+      if (error) throw error;
+      const value = data?.setting_value as Record<string, string> | null;
+      return value as HeroContent | null;
+    },
+  });
+
   const slides = dbSlides && dbSlides.length > 0 ? dbSlides : defaultSlides;
+  const welcomeText = heroContent?.welcome_text || 'Welcome to SSTU';
+  const tagline = heroContent?.tagline || 'Admissions, academics, research, and campus life—everything in one place.';
 
   useEffect(() => {
     if (slides.length === 0) return;
@@ -166,9 +187,9 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-6 text-2xl md:text-3xl font-semibold text-white drop-shadow-md"
+            className="mt-6 text-3xl md:text-4xl font-semibold text-white drop-shadow-md"
           >
-            Welcome to SSTU
+            {welcomeText}
           </motion.p>
 
           {/* Tagline */}
@@ -178,7 +199,7 @@ export const HeroSection = () => {
             transition={{ duration: 0.6, delay: 0.5 }}
             className="mt-4 text-lg md:text-xl text-white/90 drop-shadow-sm"
           >
-            Admissions, academics, research, and campus life—everything in one place.
+            {tagline}
           </motion.p>
 
           {/* Search Bar */}
