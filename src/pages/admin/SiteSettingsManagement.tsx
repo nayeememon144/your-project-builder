@@ -24,7 +24,8 @@ import {
   Palette,
   BookOpen,
   Network,
-  Video
+  Video,
+  Home
 } from 'lucide-react';
 
 type SiteSetting = {
@@ -56,6 +57,12 @@ const SiteSettingsManagement = () => {
     established_year: '2020',
     glance_image: '',
     glance_text: '',
+  });
+
+  // Hero Content settings
+  const [heroContentSettings, setHeroContentSettings] = useState({
+    welcome_text: 'Welcome to SSTU',
+    tagline: 'Admissions, academics, research, and campus life—everything in one place.',
   });
 
   // VC Message settings
@@ -188,6 +195,12 @@ const SiteSettingsManagement = () => {
             ...value,
           }));
         }
+        if (setting.setting_key === 'hero_content' && value) {
+          setHeroContentSettings(prev => ({
+            ...prev,
+            ...value,
+          }));
+        }
       });
       
       return data as SiteSetting[];
@@ -314,6 +327,10 @@ const SiteSettingsManagement = () => {
     saveMutation.mutate({ key: 'campus_life', value: campusLifeSettings });
   };
 
+  const handleSaveHeroContent = () => {
+    saveMutation.mutate({ key: 'hero_content', value: heroContentSettings });
+  };
+
   if (isLoading) {
     return (
       <AdminLayout>
@@ -333,8 +350,12 @@ const SiteSettingsManagement = () => {
           <p className="text-muted-foreground">Manage university information, about page, VC message, and contact details</p>
         </div>
 
-        <Tabs defaultValue="glance" className="space-y-6">
+        <Tabs defaultValue="hero" className="space-y-6">
           <TabsList className="flex flex-wrap h-auto gap-1">
+            <TabsTrigger value="hero" className="gap-2">
+              <Home className="w-4 h-4" />
+              Hero Content
+            </TabsTrigger>
             <TabsTrigger value="glance" className="gap-2">
               <Info className="w-4 h-4" />
               At a Glance
@@ -376,6 +397,51 @@ const SiteSettingsManagement = () => {
               Campus Life
             </TabsTrigger>
           </TabsList>
+
+          {/* Hero Content Settings */}
+          <TabsContent value="hero" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Home className="w-5 h-5" />
+                  Hero Section Content
+                </CardTitle>
+                <CardDescription>
+                  Update the welcome text and tagline displayed on the homepage hero section
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="welcome_text">Welcome Text</Label>
+                  <Input
+                    id="welcome_text"
+                    value={heroContentSettings.welcome_text}
+                    onChange={(e) => setHeroContentSettings({ ...heroContentSettings, welcome_text: e.target.value })}
+                    placeholder="Welcome to SSTU"
+                  />
+                  <p className="text-xs text-muted-foreground">This appears below the university name</p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="tagline">Tagline</Label>
+                  <Textarea
+                    id="tagline"
+                    value={heroContentSettings.tagline}
+                    onChange={(e) => setHeroContentSettings({ ...heroContentSettings, tagline: e.target.value })}
+                    rows={3}
+                    placeholder="Admissions, academics, research, and campus life—everything in one place."
+                  />
+                  <p className="text-xs text-muted-foreground">A brief description of what the university offers</p>
+                </div>
+
+                <Button onClick={handleSaveHeroContent} disabled={saveMutation.isPending} className="gap-2">
+                  {saveMutation.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  <Save className="w-4 h-4" />
+                  Save Hero Content
+                </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {/* SSTU At a Glance Settings */}
           <TabsContent value="glance" className="space-y-6">

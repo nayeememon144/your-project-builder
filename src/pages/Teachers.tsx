@@ -1,12 +1,23 @@
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Mail, Phone, ExternalLink } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Mail, Phone, ExternalLink, Search } from 'lucide-react';
 
 const Teachers = () => {
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+
+  useEffect(() => {
+    setSearchQuery(initialSearch);
+  }, [initialSearch]);
+
   const { data: teachers, isLoading } = useQuery({
     queryKey: ['public-teachers'],
     queryFn: async () => {
@@ -33,6 +44,18 @@ const Teachers = () => {
     },
   });
 
+  // Filter teachers based on search query
+  const filteredTeachers = teachers?.filter(teacher => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      teacher.full_name?.toLowerCase().includes(query) ||
+      teacher.designation?.toLowerCase().includes(query) ||
+      teacher.email?.toLowerCase().includes(query) ||
+      (teacher.departments as any)?.name?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <MainLayout>
       {/* Hero Section */}
@@ -41,9 +64,20 @@ const Teachers = () => {
           <h1 className="font-formal text-4xl md:text-5xl font-bold mb-4">
             Faculty Members
           </h1>
-          <p className="text-white/80 text-lg max-w-2xl">
+          <p className="text-white/80 text-lg max-w-2xl mb-6">
             Meet our distinguished faculty members who are dedicated to academic excellence and research
           </p>
+          {/* Search Bar */}
+          <div className="relative max-w-md">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search by name, title, or email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-12 pl-12 pr-4 bg-white text-foreground rounded-full border-0 shadow-lg"
+            />
+          </div>
         </div>
       </section>
 
@@ -56,9 +90,9 @@ const Teachers = () => {
                 <Skeleton key={idx} className="h-64 rounded-xl" />
               ))}
             </div>
-          ) : teachers && teachers.length > 0 ? (
+          ) : filteredTeachers && filteredTeachers.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {teachers.map((teacher) => (
+              {filteredTeachers.map((teacher) => (
                 <Link key={teacher.id} to={`/teachers/${teacher.id}`}>
                   <Card className="h-full hover:shadow-lg transition-all group">
                     <CardContent className="p-6 text-center">
