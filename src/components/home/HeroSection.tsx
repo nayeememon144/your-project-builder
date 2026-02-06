@@ -1,8 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, Search } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import campus1 from '@/assets/campus/campus-1.jpg';
 import campus2 from '@/assets/campus/campus-2.jpg';
 import campus3 from '@/assets/campus/campus-3.jpg';
@@ -35,10 +38,8 @@ const OptimizedHeroImage = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [imageSrc, setImageSrc] = useState<string>('');
 
-  // Add optimization parameters for Unsplash images
   const getOptimizedUrl = useCallback((url: string) => {
     if (url.includes('unsplash.com')) {
-      // Add WebP format and quality optimization for Unsplash
       const separator = url.includes('?') ? '&' : '?';
       return `${url}${separator}fm=webp&q=80&fit=crop&w=1920&h=1080`;
     }
@@ -46,7 +47,6 @@ const OptimizedHeroImage = ({
   }, []);
 
   useEffect(() => {
-    // Only load if priority or if becoming active soon
     if (priority || isActive) {
       const optimizedUrl = getOptimizedUrl(src);
       const img = new Image();
@@ -63,7 +63,7 @@ const OptimizedHeroImage = ({
       className="absolute inset-0 bg-cover bg-center transition-transform duration-[6000ms] ease-linear"
       style={{ 
         backgroundImage: isLoaded ? `url(${imageSrc})` : undefined,
-        backgroundColor: !isLoaded ? '#1a1a2e' : undefined,
+        backgroundColor: !isLoaded ? 'hsl(var(--primary))' : undefined,
         transform: isActive ? 'scale(1.1)' : 'scale(1)'
       }}
     >
@@ -79,8 +79,9 @@ const OptimizedHeroImage = ({
 export const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
-  // Fetch hero slides from database
   const { data: dbSlides } = useQuery({
     queryKey: ['hero-slides'],
     queryFn: async () => {
@@ -94,7 +95,6 @@ export const HeroSection = () => {
     },
   });
 
-  // Use database slides if available, otherwise use defaults
   const slides = dbSlides && dbSlides.length > 0 ? dbSlides : defaultSlides;
 
   useEffect(() => {
@@ -102,16 +102,17 @@ export const HeroSection = () => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 6000);
-
     return () => clearInterval(timer);
   }, [slides.length]);
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
-  };
+  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
+  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/teachers?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
   };
 
   return (
@@ -120,7 +121,7 @@ export const HeroSection = () => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Background Slides - Optimized with lazy loading */}
+      {/* Background Slides */}
       {slides.map((slide, index) => {
         const isActive = index === currentSlide;
         const isNext = index === (currentSlide + 1) % slides.length;
@@ -141,42 +142,71 @@ export const HeroSection = () => {
               isActive={isActive}
               priority={index === 0 || isNext || isPrev}
             />
-            {/* Subtle dark gradient overlay - keeps image visible */}
-            <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/50" />
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50" />
           </div>
         );
       })}
 
-      {/* Fixed Content Card - Does NOT animate with slides */}
-      <div className="relative z-10 h-full container mx-auto flex items-center justify-center">
-        <div className="text-center">
-          {/* Glass Card with University Name */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-white/10 backdrop-blur-lg rounded-2xl px-8 py-10 md:px-16 md:py-14 border border-white/20 shadow-[0_0_60px_rgba(255,255,255,0.15),0_0_100px_rgba(34,139,87,0.2)] max-w-5xl mx-4"
+      {/* Hero Content */}
+      <div className="relative z-10 h-full container mx-auto flex flex-col items-center justify-center px-4">
+        <div className="text-center max-w-4xl">
+          {/* University Name */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+            className="font-formal text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-wide drop-shadow-lg"
           >
-            {/* Welcome Text - Smaller */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              className="text-white/80 tracking-[0.2em] uppercase text-xs md:text-sm mb-3"
-            >
-              Welcome To
-            </motion.p>
+            Sunamgonj Science and Technology University
+          </motion.h1>
 
-            {/* University Name - Highlighted and Prominent */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="font-formal text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-wide text-center"
+          {/* Welcome Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-6 text-2xl md:text-3xl font-semibold text-white drop-shadow-md"
+          >
+            Welcome to SSTU
+          </motion.p>
+
+          {/* Tagline */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+            className="mt-4 text-lg md:text-xl text-white/90 drop-shadow-sm"
+          >
+            Admissions, academics, research, and campus life—everything in one place.
+          </motion.p>
+
+          {/* Search Bar */}
+          <motion.form
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            onSubmit={handleSearch}
+            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-2xl mx-auto"
+          >
+            <div className="relative flex-1 w-full">
+              <Input
+                type="text"
+                placeholder="Search faculty/staff (name, title, email)"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="h-14 pl-5 pr-4 text-base bg-white/95 border-0 rounded-full shadow-xl placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-primary"
+              />
+            </div>
+            <Button
+              type="submit"
+              size="lg"
+              className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xl"
             >
-              Sunamgonj Science and Technology University
-            </motion.h1>
-          </motion.div>
+              <Search className="w-5 h-5 mr-2" />
+              Search
+            </Button>
+          </motion.form>
         </div>
       </div>
 
@@ -226,21 +256,21 @@ export const HeroSection = () => {
         ))}
       </div>
 
-      {/* Scroll Down Indicator */}
+      {/* Scroll Down Button */}
       <motion.button
         onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-        className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/90 hover:text-white transition-colors cursor-pointer"
+        className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 px-6 py-2 rounded-full bg-primary/90 text-primary-foreground hover:bg-primary transition-colors cursor-pointer shadow-lg"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1, duration: 0.5 }}
         aria-label="Scroll down"
       >
-        <span className="text-sm font-medium uppercase tracking-widest">Scroll</span>
+        <span className="text-sm font-medium">Scroll</span>
         <motion.div
-          animate={{ y: [0, 8, 0] }}
+          animate={{ y: [0, 4, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
         >
-          <ChevronDown className="w-7 h-7" />
+          <ChevronDown className="w-5 h-5" />
         </motion.div>
       </motion.button>
     </section>
