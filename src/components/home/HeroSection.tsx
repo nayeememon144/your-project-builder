@@ -149,8 +149,8 @@ export const HeroSection = () => {
       })}
 
       {/* Hero Content */}
-      <div className="relative z-10 h-full container mx-auto flex flex-col items-center justify-center px-4">
-        <div className="text-center max-w-4xl">
+      <div className="relative z-10 h-full container mx-auto flex flex-col items-start justify-center px-4 md:px-8 lg:px-16">
+        <div className="text-left max-w-3xl">
           {/* University Name */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -187,7 +187,7 @@ export const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
             onSubmit={handleSearch}
-            className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 max-w-2xl mx-auto"
+            className="mt-10 flex flex-col sm:flex-row items-start gap-3 max-w-xl"
           >
             <div className="relative flex-1 w-full">
               <Input
