@@ -173,9 +173,7 @@ export const Header = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center p-1">
-                <img src={sstuLogo} alt="SSTU Logo" className="w-full h-full object-contain" />
-              </div>
+              <img src={sstuLogo} alt="SSTU Logo" className="w-16 h-16 object-contain" />
               <div className="hidden sm:block">
                 <h1 className="font-serif text-lg md:text-xl font-semibold text-white leading-tight tracking-wide">
                   Sunamgonj Science and Technology University

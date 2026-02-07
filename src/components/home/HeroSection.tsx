@@ -77,6 +77,7 @@ const OptimizedHeroImage = ({
 };
 
 interface HeroContent {
+  university_name?: string;
   welcome_text?: string;
   tagline?: string;
 }
@@ -115,6 +116,7 @@ export const HeroSection = () => {
   });
 
   const slides = dbSlides && dbSlides.length > 0 ? dbSlides : defaultSlides;
+  const universityName = heroContent?.university_name || 'Sunamgonj Science and Technology University';
   const welcomeText = heroContent?.welcome_text || 'Welcome to SSTU';
   const tagline = heroContent?.tagline || 'Admissions, academics, research, and campus life—everything in one place.';
 
@@ -179,7 +181,7 @@ export const HeroSection = () => {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="font-formal text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-wide drop-shadow-lg"
           >
-            Sunamgonj Science and Technology University
+            {universityName}
           </motion.h1>
 
           {/* Welcome Subtitle */}
@@ -280,15 +282,15 @@ export const HeroSection = () => {
       {/* Scroll Down Button */}
       <motion.button
         onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-        className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 px-6 py-2 rounded-full bg-primary/90 text-primary-foreground hover:bg-primary transition-colors cursor-pointer shadow-lg"
+        className="absolute z-20 bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors cursor-pointer"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1, duration: 0.5 }}
         aria-label="Scroll down"
       >
-        <span className="text-sm font-medium">Scroll</span>
+        <span className="text-xs tracking-widest uppercase">Scroll</span>
         <motion.div
-          animate={{ y: [0, 4, 0] }}
+          animate={{ y: [0, 6, 0] }}
           transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
         >
           <ChevronDown className="w-5 h-5" />
