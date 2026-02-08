@@ -18,9 +18,9 @@ interface HeroSlide {
 }
 
 const defaultSlides: HeroSlide[] = [
-  { id: '1', image_url: campus1 },
-  { id: '2', image_url: campus2 },
-  { id: '3', image_url: campus3 },
+  { id: '1', image_url: campus1, title: 'Welcome to SSTU', subtitle: 'Admissions, academics, research, and campus life—everything in one place.' },
+  { id: '2', image_url: campus2, title: 'Research & Innovation', subtitle: 'Pushing boundaries through cutting-edge research and discovery.' },
+  { id: '3', image_url: campus3, title: 'Excellence in Education', subtitle: 'Shaping tomorrow\'s leaders with world-class education.' },
 ];
 
 // Optimized image component with lazy loading
@@ -76,12 +76,6 @@ const OptimizedHeroImage = ({
   );
 };
 
-interface HeroContent {
-  university_name?: string;
-  welcome_text?: string;
-  tagline?: string;
-}
-
 export const HeroSection = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -101,24 +95,8 @@ export const HeroSection = () => {
     },
   });
 
-  const { data: heroContent } = useQuery({
-    queryKey: ['hero-content'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('setting_value')
-        .eq('setting_key', 'hero_content')
-        .maybeSingle();
-      if (error) throw error;
-      const value = data?.setting_value as Record<string, string> | null;
-      return value as HeroContent | null;
-    },
-  });
-
   const slides = dbSlides && dbSlides.length > 0 ? dbSlides : defaultSlides;
-  const universityName = heroContent?.university_name || 'Sunamgonj Science and Technology University';
-  const welcomeText = heroContent?.welcome_text || 'Welcome to SSTU';
-  const tagline = heroContent?.tagline || 'Admissions, academics, research, and campus life—everything in one place.';
+  const currentSlideData = slides[currentSlide];
 
   useEffect(() => {
     if (slides.length === 0) return;
@@ -136,6 +114,13 @@ export const HeroSection = () => {
     if (searchQuery.trim()) {
       navigate(`/teachers?search=${encodeURIComponent(searchQuery.trim())}`);
     }
+  };
+
+  // Animation variants for slide content
+  const textVariants = {
+    initial: { opacity: 0, y: 30 },
+    animate: { opacity: 1, y: 0 },
+    exit: { opacity: 0, y: -20 }
   };
 
   return (
@@ -174,35 +159,49 @@ export const HeroSection = () => {
       {/* Hero Content */}
       <div className="relative z-10 h-full container mx-auto flex flex-col items-start justify-center px-4 md:px-8 lg:px-16">
         <div className="text-left max-w-3xl">
-          {/* University Name */}
+          {/* University Name - Fixed position, always visible */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
             className="font-formal text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-wide drop-shadow-lg"
           >
-            {universityName}
+            Sunamgonj Science and Technology University
           </motion.h1>
 
-          {/* Welcome Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mt-6 text-3xl md:text-4xl font-semibold text-white drop-shadow-md"
-          >
-            {welcomeText}
-          </motion.p>
+          {/* Slide-specific Title - Animates with slide */}
+          <div className="h-[60px] md:h-[70px] mt-6 overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={`title-${currentSlide}`}
+                variants={textVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                className="text-2xl md:text-3xl lg:text-4xl font-semibold text-primary drop-shadow-md italic"
+              >
+                {currentSlideData?.title || 'Welcome to SSTU'}
+              </motion.p>
+            </AnimatePresence>
+          </div>
 
-          {/* Tagline */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="mt-4 text-lg md:text-xl text-white/90 drop-shadow-sm"
-          >
-            {tagline}
-          </motion.p>
+          {/* Slide-specific Subtitle - Animates with slide */}
+          <div className="h-[30px] md:h-[35px] mt-2 overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={`subtitle-${currentSlide}`}
+                variants={textVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+                className="text-base md:text-lg lg:text-xl text-white/90 drop-shadow-sm"
+              >
+                {currentSlideData?.subtitle || 'Admissions, academics, research, and campus life—everything in one place.'}
+              </motion.p>
+            </AnimatePresence>
+          </div>
 
           {/* Search Bar */}
           <motion.form
@@ -271,7 +270,7 @@ export const HeroSection = () => {
             onClick={() => setCurrentSlide(idx)}
             className={`h-2 rounded-full transition-all duration-300 ${
               idx === currentSlide 
-                ? 'w-10 bg-gold' 
+                ? 'w-10 bg-primary' 
                 : 'w-2 bg-white/50 hover:bg-white'
             }`}
             aria-label={`Go to slide ${idx + 1}`}
