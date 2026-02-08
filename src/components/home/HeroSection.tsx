@@ -14,13 +14,15 @@ interface HeroSlide {
   id: string;
   image_url: string;
   title?: string;
+  title_bn?: string;
   subtitle?: string;
+  welcome_text?: string;
 }
 
 const defaultSlides: HeroSlide[] = [
-  { id: '1', image_url: campus1, title: 'Welcome to SSTU', subtitle: 'Admissions, academics, research, and campus life—everything in one place.' },
-  { id: '2', image_url: campus2, title: 'Research & Innovation', subtitle: 'Pushing boundaries through cutting-edge research and discovery.' },
-  { id: '3', image_url: campus3, title: 'Excellence in Education', subtitle: 'Shaping tomorrow\'s leaders with world-class education.' },
+  { id: '1', image_url: campus1, title: 'Sunamganj Science and Technology University', welcome_text: 'Welcome to SSTU', subtitle: 'Admissions, academics, research, and campus life—everything in one place.' },
+  { id: '2', image_url: campus2, title: 'Sunamganj Science and Technology University', welcome_text: 'Research & Innovation', subtitle: 'Pushing boundaries through cutting-edge research and discovery.' },
+  { id: '3', image_url: campus3, title: 'Sunamganj Science and Technology University', welcome_text: 'Excellence in Education', subtitle: 'Shaping tomorrow\'s leaders with world-class education.' },
 ];
 
 // Optimized image component with lazy loading
@@ -116,12 +118,6 @@ export const HeroSection = () => {
     }
   };
 
-  // Animation variants for slide content
-  const textVariants = {
-    initial: { opacity: 0, y: 30 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 }
-  };
 
   return (
     <section 
@@ -156,52 +152,49 @@ export const HeroSection = () => {
         );
       })}
 
-      {/* Hero Content */}
+      {/* Hero Content - All text animates together */}
       <div className="relative z-10 h-full container mx-auto flex flex-col items-start justify-center px-4 md:px-8 lg:px-16">
         <div className="text-left max-w-3xl">
-          {/* University Name - Fixed position, always visible */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="font-formal text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-wide drop-shadow-lg"
-          >
-            Sunamgonj Science and Technology University
-          </motion.h1>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`content-${currentSlide}`}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6 }}
+              className="space-y-4"
+            >
+              {/* University Name - Animates with slide */}
+              <motion.h1
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.1 }}
+                className="font-formal text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-wide drop-shadow-lg"
+              >
+                {currentSlideData?.title || 'Sunamganj Science and Technology University'}
+              </motion.h1>
 
-          {/* Slide-specific Title - Animates with slide */}
-          <div className="h-[60px] md:h-[70px] mt-6 overflow-hidden">
-            <AnimatePresence mode="wait">
+              {/* Welcome Text - Animates with slide */}
               <motion.p
-                key={`title-${currentSlide}`}
-                variants={textVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                transition={{ duration: 0.5, ease: "easeOut" }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
                 className="text-2xl md:text-3xl lg:text-4xl font-semibold text-primary drop-shadow-md italic"
               >
-                {currentSlideData?.title || 'Welcome to SSTU'}
+                {currentSlideData?.welcome_text || 'Welcome to SSTU'}
               </motion.p>
-            </AnimatePresence>
-          </div>
 
-          {/* Slide-specific Subtitle - Animates with slide */}
-          <div className="h-[30px] md:h-[35px] mt-2 overflow-hidden">
-            <AnimatePresence mode="wait">
+              {/* Tagline - Animates with slide */}
               <motion.p
-                key={`subtitle-${currentSlide}`}
-                variants={textVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.5 }}
                 className="text-base md:text-lg lg:text-xl text-white/90 drop-shadow-sm"
               >
                 {currentSlideData?.subtitle || 'Admissions, academics, research, and campus life—everything in one place.'}
               </motion.p>
-            </AnimatePresence>
-          </div>
+            </motion.div>
+          </AnimatePresence>
 
           {/* Search Bar */}
           <motion.form

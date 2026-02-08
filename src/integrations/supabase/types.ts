@@ -404,6 +404,8 @@ export type Database = {
           title: string
           title_bn: string | null
           updated_at: string
+          welcome_text: string | null
+          welcome_text_bn: string | null
         }
         Insert: {
           created_at?: string
@@ -418,6 +420,8 @@ export type Database = {
           title: string
           title_bn?: string | null
           updated_at?: string
+          welcome_text?: string | null
+          welcome_text_bn?: string | null
         }
         Update: {
           created_at?: string
@@ -432,6 +436,8 @@ export type Database = {
           title?: string
           title_bn?: string | null
           updated_at?: string
+          welcome_text?: string | null
+          welcome_text_bn?: string | null
         }
         Relationships: []
       }

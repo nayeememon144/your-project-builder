@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -24,7 +23,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, Save } from 'lucide-react';
+import { Plus, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface HeroSlide {
@@ -33,17 +32,13 @@ interface HeroSlide {
   title_bn: string | null;
   subtitle: string | null;
   subtitle_bn: string | null;
+  welcome_text: string | null;
+  welcome_text_bn: string | null;
   image_url: string;
   cta_text: string | null;
   cta_link: string | null;
   display_order: number | null;
   is_active: boolean | null;
-}
-
-interface HeroContent {
-  university_name: string;
-  welcome_text: string;
-  tagline: string;
 }
 
 const HeroSlidesManagement = () => {
@@ -52,8 +47,10 @@ const HeroSlidesManagement = () => {
   const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null);
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
-    title: '',
-    title_bn: '',
+    title: 'Sunamganj Science and Technology University',
+    title_bn: 'সুনামগঞ্জ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়',
+    welcome_text: '',
+    welcome_text_bn: '',
     subtitle: '',
     subtitle_bn: '',
     image_url: '',
@@ -61,12 +58,6 @@ const HeroSlidesManagement = () => {
     cta_link: '',
     display_order: 0,
     is_active: true,
-  });
-
-  const [heroContent, setHeroContent] = useState<HeroContent>({
-    university_name: 'Sunamgonj Science and Technology University',
-    welcome_text: 'Welcome to SSTU',
-    tagline: 'Admissions, academics, research, and campus life—everything in one place.',
   });
 
   const { data: slides, isLoading } = useQuery({
@@ -81,63 +72,6 @@ const HeroSlidesManagement = () => {
     },
   });
 
-  const { data: savedHeroContent } = useQuery({
-    queryKey: ['hero-content'],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('site_settings')
-        .select('setting_value')
-        .eq('setting_key', 'hero_content')
-        .maybeSingle();
-      if (error) throw error;
-      if (!data?.setting_value) return null;
-      const value = data.setting_value as unknown as HeroContent;
-      return value;
-    },
-  });
-
-  useEffect(() => {
-    if (savedHeroContent) {
-      setHeroContent({
-        university_name: savedHeroContent.university_name || 'Sunamgonj Science and Technology University',
-        welcome_text: savedHeroContent.welcome_text || 'Welcome to SSTU',
-        tagline: savedHeroContent.tagline || 'Admissions, academics, research, and campus life—everything in one place.',
-      });
-    }
-  }, [savedHeroContent]);
-
-  const saveHeroContentMutation = useMutation({
-    mutationFn: async (content: HeroContent) => {
-      const { data: existing } = await supabase
-        .from('site_settings')
-        .select('id')
-        .eq('setting_key', 'hero_content')
-        .maybeSingle();
-
-      // Cast to satisfy the Json type requirement
-      const settingValue = JSON.parse(JSON.stringify(content));
-
-      if (existing) {
-        const { error } = await supabase
-          .from('site_settings')
-          .update({ setting_value: settingValue })
-          .eq('setting_key', 'hero_content');
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('site_settings')
-          .insert([{ setting_key: 'hero_content', setting_value: settingValue }]);
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['hero-content'] });
-      toast.success('Hero content saved successfully');
-    },
-    onError: (error) => {
-      toast.error('Failed to save hero content: ' + error.message);
-    },
-  });
 
   const uploadImage = async (file: File): Promise<string> => {
     const fileExt = file.name.split('.').pop();
@@ -200,8 +134,10 @@ const HeroSlidesManagement = () => {
 
   const resetForm = () => {
     setFormData({
-      title: '',
-      title_bn: '',
+      title: 'Sunamganj Science and Technology University',
+      title_bn: 'সুনামগঞ্জ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়',
+      welcome_text: '',
+      welcome_text_bn: '',
       subtitle: '',
       subtitle_bn: '',
       image_url: '',
@@ -217,8 +153,10 @@ const HeroSlidesManagement = () => {
   const handleEdit = (slide: HeroSlide) => {
     setEditingSlide(slide);
     setFormData({
-      title: slide.title,
-      title_bn: slide.title_bn || '',
+      title: slide.title || 'Sunamganj Science and Technology University',
+      title_bn: slide.title_bn || 'সুনামগঞ্জ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়',
+      welcome_text: slide.welcome_text || '',
+      welcome_text_bn: slide.welcome_text_bn || '',
       subtitle: slide.subtitle || '',
       subtitle_bn: slide.subtitle_bn || '',
       image_url: slide.image_url,
@@ -264,67 +202,18 @@ const HeroSlidesManagement = () => {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold font-formal text-foreground">Hero Section Management</h1>
-          <p className="text-muted-foreground">Manage hero slider images and overlay content</p>
+          <h1 className="text-2xl font-bold font-formal text-foreground">Hero Slides Management</h1>
+          <p className="text-muted-foreground">Each slide contains its own image and text content that slides together</p>
         </div>
 
-        <Tabs defaultValue="content" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="content">Hero Content</TabsTrigger>
-            <TabsTrigger value="slides">Hero Slides</TabsTrigger>
-          </TabsList>
-
-          {/* Hero Content Tab */}
-          <TabsContent value="content">
-            <Card>
-              <CardHeader>
-                <CardTitle>Hero Overlay Text</CardTitle>
-                <CardDescription>
-                  This text is displayed on top of the hero slider images
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="university_name">University Name</Label>
-                  <Input
-                    id="university_name"
-                    value={heroContent.university_name}
-                    onChange={(e) => setHeroContent({ ...heroContent, university_name: e.target.value })}
-                    placeholder="Sunamgonj Science and Technology University"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="welcome_text">Welcome Text</Label>
-                  <Input
-                    id="welcome_text"
-                    value={heroContent.welcome_text}
-                    onChange={(e) => setHeroContent({ ...heroContent, welcome_text: e.target.value })}
-                    placeholder="Welcome to SSTU"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="tagline">Tagline</Label>
-                  <Textarea
-                    id="tagline"
-                    value={heroContent.tagline}
-                    onChange={(e) => setHeroContent({ ...heroContent, tagline: e.target.value })}
-                    placeholder="Admissions, academics, research, and campus life—everything in one place."
-                    rows={2}
-                  />
-                </div>
-                <Button 
-                  onClick={() => saveHeroContentMutation.mutate(heroContent)}
-                  disabled={saveHeroContentMutation.isPending}
-                >
-                  <Save className="w-4 h-4 mr-2" />
-                  {saveHeroContentMutation.isPending ? 'Saving...' : 'Save Hero Content'}
-                </Button>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Hero Slides Tab */}
-          <TabsContent value="slides">
+        <Card>
+          <CardHeader>
+            <CardTitle>Hero Slides</CardTitle>
+            <CardDescription>
+              Add slides with image and text. All content (title, subtitle, tagline) will animate together when slides change.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
             <div className="space-y-4">
               <div className="flex justify-end">
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -341,45 +230,6 @@ const HeroSlidesManagement = () => {
                       </DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="title">Title (English) *</Label>
-                          <Input
-                            id="title"
-                            value={formData.title}
-                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                            required
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="title_bn">Title (Bengali)</Label>
-                          <Input
-                            id="title_bn"
-                            value={formData.title_bn}
-                            onChange={(e) => setFormData({ ...formData, title_bn: e.target.value })}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="subtitle">Subtitle (English)</Label>
-                          <Textarea
-                            id="subtitle"
-                            value={formData.subtitle}
-                            onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="subtitle_bn">Subtitle (Bengali)</Label>
-                          <Textarea
-                            id="subtitle_bn"
-                            value={formData.subtitle_bn}
-                            onChange={(e) => setFormData({ ...formData, subtitle_bn: e.target.value })}
-                          />
-                        </div>
-                      </div>
-
                       <div className="space-y-2">
                         <Label>Slide Image *</Label>
                         <div className="flex items-center gap-4">
@@ -400,7 +250,70 @@ const HeroSlidesManagement = () => {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="cta_text">Button Text</Label>
+                          <Label htmlFor="title">University Name (English) *</Label>
+                          <Input
+                            id="title"
+                            value={formData.title}
+                            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                            placeholder="Sunamganj Science and Technology University"
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="title_bn">University Name (Bengali)</Label>
+                          <Input
+                            id="title_bn"
+                            value={formData.title_bn}
+                            onChange={(e) => setFormData({ ...formData, title_bn: e.target.value })}
+                            placeholder="সুনামগঞ্জ বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="welcome_text">Welcome Text (English)</Label>
+                          <Input
+                            id="welcome_text"
+                            value={formData.welcome_text}
+                            onChange={(e) => setFormData({ ...formData, welcome_text: e.target.value })}
+                            placeholder="e.g., Research & Innovation, Welcome to SSTU"
+                          />
+                          <p className="text-xs text-muted-foreground">Shown in green below the university name</p>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="welcome_text_bn">Welcome Text (Bengali)</Label>
+                          <Input
+                            id="welcome_text_bn"
+                            value={formData.welcome_text_bn}
+                            onChange={(e) => setFormData({ ...formData, welcome_text_bn: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="subtitle">Tagline (English)</Label>
+                          <Textarea
+                            id="subtitle"
+                            value={formData.subtitle}
+                            onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
+                            placeholder="Admissions, academics, research, and campus life—everything in one place."
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="subtitle_bn">Tagline (Bengali)</Label>
+                          <Textarea
+                            id="subtitle_bn"
+                            value={formData.subtitle_bn}
+                            onChange={(e) => setFormData({ ...formData, subtitle_bn: e.target.value })}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="cta_text">Button Text (Optional)</Label>
                           <Input
                             id="cta_text"
                             value={formData.cta_text}
@@ -460,7 +373,7 @@ const HeroSlidesManagement = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Image</TableHead>
-                        <TableHead>Title</TableHead>
+                        <TableHead>Content</TableHead>
                         <TableHead>Order</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead className="text-right">Actions</TableHead>
@@ -476,7 +389,17 @@ const HeroSlidesManagement = () => {
                               className="w-24 h-16 object-cover rounded"
                             />
                           </TableCell>
-                          <TableCell className="font-medium">{slide.title}</TableCell>
+                          <TableCell>
+                            <div className="space-y-1">
+                              <p className="font-medium text-sm line-clamp-1">{slide.title}</p>
+                              {slide.welcome_text && (
+                                <p className="text-xs text-primary line-clamp-1">{slide.welcome_text}</p>
+                              )}
+                              {slide.subtitle && (
+                                <p className="text-xs text-muted-foreground line-clamp-1">{slide.subtitle}</p>
+                              )}
+                            </div>
+                          </TableCell>
                           <TableCell>{slide.display_order}</TableCell>
                           <TableCell>
                             <span className={`px-2 py-1 rounded-full text-xs ${
@@ -511,8 +434,8 @@ const HeroSlidesManagement = () => {
                 </div>
               )}
             </div>
-          </TabsContent>
-        </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </AdminLayout>
   );
