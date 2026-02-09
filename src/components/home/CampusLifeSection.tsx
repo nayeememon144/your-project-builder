@@ -123,7 +123,7 @@ export const CampusLifeSection = () => {
           </p>
           
           <div>
-            <Link to="/about">
+            <Link to="/campus-life">
               <Button className="bg-primary text-primary-foreground hover:bg-primary/90 group font-semibold px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 text-base">
                 Find out more
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />

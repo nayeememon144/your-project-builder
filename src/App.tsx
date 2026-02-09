@@ -40,6 +40,7 @@ import Organogram from "./pages/about/Organogram";
 import Bulletin from "./pages/about/Bulletin";
 import Monogram from "./pages/about/Monogram";
 import CampusMap from "./pages/about/CampusMap";
+import CampusLife from "./pages/CampusLife";
 import Academic from "./pages/Academic";
 import AcademicCalendar from "./pages/AcademicCalendar";
 import Admission from "./pages/Admission";
@@ -77,6 +78,7 @@ const App = () => (
           <Route path="/about/bulletin" element={<Bulletin />} />
           <Route path="/about/monogram" element={<Monogram />} />
           <Route path="/about/campus-map" element={<CampusMap />} />
+          <Route path="/campus-life" element={<CampusLife />} />
           <Route path="/academic" element={<Academic />} />
           <Route path="/academic/calendar" element={<AcademicCalendar />} />
           <Route path="/academic/*" element={<Academic />} />
