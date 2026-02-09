@@ -179,7 +179,7 @@ export const HeroSection = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className="text-2xl md:text-3xl lg:text-4xl font-semibold text-primary drop-shadow-md italic"
+                className="text-2xl md:text-3xl lg:text-4xl font-semibold text-white drop-shadow-md italic"
               >
                 {currentSlideData?.welcome_text || 'Welcome to SSTU'}
               </motion.p>
