@@ -92,6 +92,11 @@ const menuItems = [
     icon: Building2 
   },
   { 
+    title: 'Halls of Residence', 
+    href: '/admin/halls', 
+    icon: Building2 
+  },
+  { 
     title: 'Teachers', 
     href: '/admin/teachers', 
     icon: Users 

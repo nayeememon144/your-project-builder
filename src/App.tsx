@@ -23,6 +23,7 @@ import AdminFacilities from "./pages/admin/FacilitiesManagement";
 import AdminStudents from "./pages/admin/StudentsManagement";
 import AdminResearch from "./pages/admin/ResearchManagement";
 import AdminAcademicCalendar from "./pages/admin/AcademicCalendarManagement";
+import AdminHalls from "./pages/admin/HallsManagement";
 import TeacherLogin from "./pages/teacher/Login";
 import TeacherRegister from "./pages/teacher/Register";
 import TeacherDashboard from "./pages/teacher/Dashboard";
@@ -243,6 +244,14 @@ const App = () => (
             element={
               <ProtectedRoute requiredRole="admin">
                 <AdminAcademicCalendar />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/halls" 
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminHalls />
               </ProtectedRoute>
             } 
           />
