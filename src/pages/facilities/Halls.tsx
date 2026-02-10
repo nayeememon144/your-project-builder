@@ -1,28 +1,23 @@
 import { MainLayout } from '@/components/layout/MainLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Users, Wifi, UtensilsCrossed, ShieldCheck, Phone } from 'lucide-react';
+import { Building2, Wifi, UtensilsCrossed, ShieldCheck, Users, Phone, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 const Halls = () => {
-  const halls = [
-    {
-      name: 'Shaheed Minar Hall',
-      type: 'Male',
-      capacity: 200,
-      facilities: ['Wi-Fi', 'Reading Room', 'Common Room', 'Dining Hall'],
+  const { data: halls, isLoading } = useQuery({
+    queryKey: ['halls-public'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('facilities')
+        .select('*')
+        .eq('category', 'hall')
+        .eq('is_active', true)
+        .order('display_order', { ascending: true });
+      if (error) throw error;
+      return data;
     },
-    {
-      name: 'Begum Rokeya Hall',
-      type: 'Female',
-      capacity: 150,
-      facilities: ['Wi-Fi', 'Reading Room', 'Common Room', 'Dining Hall', 'Guest Room'],
-    },
-    {
-      name: 'Bangabandhu Hall',
-      type: 'Male',
-      capacity: 250,
-      facilities: ['Wi-Fi', 'Reading Room', 'Common Room', 'Dining Hall', 'Sports Facilities'],
-    },
-  ];
+  });
 
   const amenities = [
     { icon: Wifi, label: 'High-Speed Wi-Fi' },
@@ -59,10 +54,6 @@ const Halls = () => {
                 Our halls offer a conducive environment for academic excellence while ensuring 
                 students' comfort and safety throughout their stay.
               </p>
-              <p>
-                Each hall is equipped with modern amenities including high-speed internet, 
-                reading rooms, common areas, and dining facilities managed by dedicated staff.
-              </p>
             </CardContent>
           </Card>
         </div>
@@ -85,35 +76,52 @@ const Halls = () => {
         {/* Halls List */}
         <div className="max-w-6xl mx-auto">
           <h2 className="text-2xl font-bold text-center mb-8">Our Halls</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {halls.map((hall, index) => (
-              <Card key={index} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="bg-primary/5">
-                  <div className="flex items-center gap-3">
-                    <Building2 className="w-8 h-8 text-primary" />
-                    <div>
-                      <CardTitle className="text-lg">{hall.name}</CardTitle>
-                      <p className="text-sm text-muted-foreground">{hall.type} Hall</p>
+          {isLoading ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : halls && halls.length > 0 ? (
+            <div className="grid md:grid-cols-3 gap-6">
+              {halls.map((hall) => (
+                <Card key={hall.id} className="hover:shadow-lg transition-shadow">
+                  {hall.featured_image && (
+                    <div className="h-48 overflow-hidden rounded-t-lg">
+                      <img src={hall.featured_image} alt={hall.name} className="w-full h-full object-cover" />
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-6">
-                  <div className="mb-4">
-                    <span className="text-2xl font-bold text-primary">{hall.capacity}</span>
-                    <span className="text-muted-foreground ml-2">seats</span>
-                  </div>
-                  <div>
-                    <p className="font-medium mb-2">Facilities:</p>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      {hall.facilities.map((facility, idx) => (
-                        <li key={idx}>• {facility}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                  )}
+                  <CardHeader className={!hall.featured_image ? "bg-primary/5" : ""}>
+                    <div className="flex items-center gap-3">
+                      <Building2 className="w-8 h-8 text-primary flex-shrink-0" />
+                      <div>
+                        <CardTitle className="text-lg">{hall.name}</CardTitle>
+                        {hall.name_bn && <p className="text-sm text-muted-foreground">{hall.name_bn}</p>}
+                        {hall.short_name && <p className="text-xs text-muted-foreground">{hall.short_name}</p>}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6">
+                    {hall.description && (
+                      <p className="text-sm text-muted-foreground mb-3">{hall.description}</p>
+                    )}
+                    {hall.location && (
+                      <p className="text-sm mb-1"><span className="font-medium">Location:</span> {hall.location}</p>
+                    )}
+                    {hall.operating_hours && (
+                      <p className="text-sm mb-1"><span className="font-medium">Hours:</span> {hall.operating_hours}</p>
+                    )}
+                    {hall.contact_phone && (
+                      <p className="text-sm mb-1"><span className="font-medium">Phone:</span> {hall.contact_phone}</p>
+                    )}
+                    {hall.contact_email && (
+                      <p className="text-sm"><span className="font-medium">Email:</span> {hall.contact_email}</p>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground py-8">No halls information available at the moment.</p>
+          )}
         </div>
 
         {/* Contact */}
