@@ -249,7 +249,7 @@ const TeacherProfile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 font-formal">
                   <FileText className="w-5 h-5 text-primary" />
-                  Research Publications
+                  Research Publications ({publications?.length || 0})
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -260,38 +260,107 @@ const TeacherProfile = () => {
                     ))}
                   </div>
                 ) : publications && publications.length > 0 ? (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {publications.map((pub) => (
-                      <div key={pub.id} className="border-l-4 border-gold pl-4 py-2">
-                        <h4 className="font-semibold text-foreground">{pub.title}</h4>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {pub.authors?.join(', ')}
+                      <div key={pub.id} className="border-l-4 border-gold pl-4 py-3 space-y-2">
+                        {/* Title & Type */}
+                        <div className="flex flex-wrap items-start gap-2">
+                          <h4 className="font-semibold text-foreground flex-1">{pub.title}</h4>
+                          {pub.publication_type && (
+                            <Badge variant="outline" className="capitalize text-xs shrink-0">
+                              {pub.publication_type.replace('_', ' ')}
+                            </Badge>
+                          )}
+                        </div>
+
+                        {/* Authors */}
+                        <p className="text-sm text-muted-foreground">
+                          <span className="font-medium">Authors:</span> {pub.authors?.join(', ')}
+                          {pub.is_corresponding_author && <span className="text-gold ml-1">(Corresponding Author)</span>}
                         </p>
+
+                        {/* Journal / Conference */}
                         {pub.journal_conference_name && (
                           <p className="text-sm text-muted-foreground italic">
                             {pub.journal_conference_name}
-                            {pub.publication_date && ` (${new Date(pub.publication_date).getFullYear()})`}
+                            {pub.publisher && ` — ${pub.publisher}`}
                           </p>
                         )}
-                        <div className="flex gap-3 mt-2">
+
+                        {/* Volume, Issue, Pages, Date */}
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                          {pub.publication_date && (
+                            <span><strong>Date:</strong> {new Date(pub.publication_date).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })}</span>
+                          )}
+                          {pub.volume && <span><strong>Vol:</strong> {pub.volume}</span>}
+                          {pub.issue && <span><strong>Issue:</strong> {pub.issue}</span>}
+                          {pub.pages && <span><strong>Pages:</strong> {pub.pages}</span>}
+                          {pub.impact_factor && <span><strong>Impact Factor:</strong> {pub.impact_factor}</span>}
+                          {(pub.citation_count ?? 0) > 0 && <span><strong>Citations:</strong> {pub.citation_count}</span>}
+                        </div>
+
+                        {/* Indexed In */}
+                        {pub.indexed_in && pub.indexed_in.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            <span className="text-xs text-muted-foreground font-medium">Indexed in:</span>
+                            {pub.indexed_in.map((idx: string, i: number) => (
+                              <Badge key={i} variant="secondary" className="text-[10px] px-1.5 py-0">{idx}</Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Keywords */}
+                        {pub.keywords && pub.keywords.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            <span className="text-xs text-muted-foreground font-medium">Keywords:</span>
+                            {pub.keywords.map((kw: string, i: number) => (
+                              <Badge key={i} variant="outline" className="text-[10px] px-1.5 py-0">{kw}</Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Abstract */}
+                        {pub.abstract && (
+                          <details className="mt-1">
+                            <summary className="text-xs font-medium text-primary cursor-pointer hover:underline">
+                              View Abstract
+                            </summary>
+                            <p className="text-sm text-muted-foreground mt-2 whitespace-pre-line bg-muted/50 p-3 rounded-md">
+                              {pub.abstract}
+                            </p>
+                          </details>
+                        )}
+
+                        {/* Links */}
+                        <div className="flex flex-wrap gap-3 mt-1">
                           {pub.doi_link && (
-                            <a
-                              href={pub.doi_link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-primary hover:underline"
-                            >
-                              DOI
+                            <a href={pub.doi_link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1">
+                              <ExternalLink className="w-3 h-3" /> DOI
                             </a>
                           )}
                           {pub.pdf_url && (
-                            <a
-                              href={pub.pdf_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-xs text-primary hover:underline"
-                            >
-                              PDF
+                            <a href={pub.pdf_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1">
+                              <FileText className="w-3 h-3" /> PDF
+                            </a>
+                          )}
+                          {pub.google_scholar_link && (
+                            <a href={pub.google_scholar_link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1">
+                              <ExternalLink className="w-3 h-3" /> Google Scholar
+                            </a>
+                          )}
+                          {pub.researchgate_link && (
+                            <a href={pub.researchgate_link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1">
+                              <ExternalLink className="w-3 h-3" /> ResearchGate
+                            </a>
+                          )}
+                          {pub.scopus_link && (
+                            <a href={pub.scopus_link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1">
+                              <ExternalLink className="w-3 h-3" /> Scopus
+                            </a>
+                          )}
+                          {pub.pubmed_link && (
+                            <a href={pub.pubmed_link} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline flex items-center gap-1">
+                              <ExternalLink className="w-3 h-3" /> PubMed
                             </a>
                           )}
                         </div>
