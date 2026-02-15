@@ -53,6 +53,7 @@ import Contact from "./pages/Contact";
 import Gallery from "./pages/Gallery";
 import ProgramDetail from "./pages/ProgramDetail";
 import Events from "./pages/Events";
+import Install from "./pages/Install";
 import DSW from "./pages/facilities/DSW";
 import Halls from "./pages/facilities/Halls";
 import Organizations from "./pages/facilities/Organizations";
@@ -95,6 +96,7 @@ const App = () => (
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/programs/:id" element={<ProgramDetail />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/install" element={<Install />} />
           
           {/* Facilities Routes */}
           <Route path="/facilities/dsw" element={<DSW />} />
