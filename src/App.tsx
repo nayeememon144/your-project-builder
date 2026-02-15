@@ -54,7 +54,7 @@ import Gallery from "./pages/Gallery";
 import ProgramDetail from "./pages/ProgramDetail";
 import Events from "./pages/Events";
 import Install from "./pages/Install";
-import DSW from "./pages/facilities/DSW";
+import DSW from "@/pages/facilities/DSW";
 import Halls from "./pages/facilities/Halls";
 import Organizations from "./pages/facilities/Organizations";
 import EResources from "./pages/facilities/EResources";
