@@ -111,8 +111,8 @@ const App = () => (
           <Route path="/centers/*" element={<Research />} />
           <Route path="/institutes/*" element={<Academic />} />
           
-          {/* Admin Routes */}
-          <Route path="/admin/login" element={<AdminLogin />} />
+          {/* Admin Routes - secret URL */}
+          <Route path="/monasa/admin" element={<AdminLogin />} />
           <Route 
             path="/admin/dashboard" 
             element={
