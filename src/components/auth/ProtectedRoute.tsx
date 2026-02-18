@@ -75,7 +75,7 @@ export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) 
 
   // Not authenticated
   if (!session) {
-    const loginPath = requiredRole === 'admin' ? '/admin/login' 
+    const loginPath = requiredRole === 'admin' ? '/monasa/admin' 
       : requiredRole === 'teacher' ? '/teacher/login' 
       : '/student/login';
     return <Navigate to={loginPath} state={{ from: location }} replace />;
