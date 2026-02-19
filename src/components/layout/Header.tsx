@@ -170,13 +170,19 @@ export const Header = () => {
           : "bg-primary border-primary/20"
       )}>
         <div className="container mx-auto">
-          <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3">
-              <img src={sstuLogo} alt="SSTU Logo" className="w-16 h-16 object-contain" />
-              <div className="hidden sm:block">
-                <h1 className="font-serif text-lg md:text-xl font-semibold text-white leading-tight tracking-wide">
+            <Link to="/" className="flex items-center gap-2 min-w-0">
+              <img src={sstuLogo} alt="SSTU Logo" className="w-12 h-12 lg:w-16 lg:h-16 flex-shrink-0 object-contain" />
+              <div className="hidden sm:block min-w-0">
+                <h1 className="font-serif text-base md:text-lg lg:text-xl font-semibold text-white leading-tight tracking-wide truncate">
                   Sunamgonj Science and Technology University
+                </h1>
+              </div>
+              {/* Mobile-only short name */}
+              <div className="sm:hidden min-w-0">
+                <h1 className="font-serif text-sm font-semibold text-white leading-tight">
+                  SSTU
                 </h1>
               </div>
             </Link>
@@ -227,7 +233,7 @@ export const Header = () => {
                             <Link
                               key={idx}
                               to={subItem.href}
-                              className="flex items-center gap-2 px-4 py-1.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-primary transition-colors"
+                              className="flex items-center gap-2 px-4 py-1.5 text-sm text-foreground/80 hover:bg-secondary hover:text-primary transition-colors"
                             >
                               <ChevronRight className="w-3 h-3 text-gold" />
                               {subItem.label}
@@ -260,13 +266,13 @@ export const Header = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-white"
+              className="lg:hidden p-3 text-white rounded-lg hover:bg-white/10 active:bg-white/20 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
         </div>
-
 
         {/* Mobile Menu */}
         <AnimatePresence>
@@ -277,27 +283,48 @@ export const Header = () => {
               exit={{ height: 0, opacity: 0 }}
               className="lg:hidden border-t border-white/10 overflow-hidden bg-primary"
             >
-              <div className="container mx-auto py-4 space-y-1">
+              <div className="container mx-auto py-3 space-y-0.5 max-h-[70vh] overflow-y-auto">
                 {mainNavItems.map((item) => (
-                  <Link
-                    key={item.label}
-                    to={item.href}
-                    className="block px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
+                  <div key={item.label}>
+                    <Link
+                      to={item.href}
+                      className="flex items-center justify-between px-4 py-3.5 text-white hover:bg-white/10 active:bg-white/20 rounded-lg transition-colors font-medium text-sm min-h-[48px]"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <span>{item.label}</span>
+                      {(item.dropdown || item.hasMegaMenu) && (
+                        <ChevronRight className="w-4 h-4 text-white/60" />
+                      )}
+                    </Link>
+                    {/* Show first few sub-items inline on mobile */}
+                    {item.dropdown && (
+                      <div className="pl-4 pb-1 space-y-0.5">
+                        {item.dropdown.slice(0, 4).map((sub, idx) => (
+                          <Link
+                            key={idx}
+                            to={sub.href}
+                            className="flex items-center gap-2 px-4 py-2.5 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors text-xs min-h-[40px]"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            <ChevronRight className="w-3 h-3 text-gold/70 flex-shrink-0" />
+                            {sub.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
-                <div className="pt-4 border-t border-white/10 space-y-1">
+                <div className="pt-3 border-t border-white/10 space-y-0.5">
+                  <p className="px-4 py-1 text-xs uppercase tracking-widest text-white/50 font-medium">Portals</p>
                   {portalLinks.map((link, idx) => (
                     <Link
                       key={idx}
                       to={link.href}
-                      className="flex items-center gap-3 px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
+                      className="flex items-center gap-3 px-4 py-3.5 text-white hover:bg-white/10 active:bg-white/20 rounded-lg transition-colors min-h-[48px]"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <link.icon className="w-5 h-5 text-gold" />
-                      <span>{link.label}</span>
+                      <link.icon className="w-5 h-5 text-gold flex-shrink-0" />
+                      <span className="text-sm font-medium">{link.label}</span>
                     </Link>
                   ))}
                 </div>

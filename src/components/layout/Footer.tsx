@@ -89,7 +89,7 @@ export const Footer = () => {
   return (
     <footer className="bg-primary text-primary-foreground">
       {/* Main Footer */}
-      <div className="container mx-auto py-12">
+      <div className="container mx-auto py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Academics & Admission */}
           <div>
@@ -229,14 +229,14 @@ export const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom Bar */}
+      {/* Bottom Bar - adds padding for mobile bottom nav */}
       <div className="bg-primary/80 border-t border-primary-foreground/10">
-        <div className="container mx-auto py-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-primary-foreground/70">
-            <p>
+        <div className="container mx-auto py-4 px-4">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-sm text-primary-foreground/70">
+            <p className="text-center md:text-left text-xs md:text-sm">
               © {new Date().getFullYear()} Sunamgonj Science & Technology University. All rights reserved.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 text-xs md:text-sm flex-wrap justify-center">
               <Link to="/privacy" className="hover:text-gold transition-colors">Privacy Policy</Link>
               <span>|</span>
               <Link to="/terms" className="hover:text-gold transition-colors">Terms of Use</Link>
