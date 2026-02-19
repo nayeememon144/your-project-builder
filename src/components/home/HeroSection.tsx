@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import campus1 from '@/assets/campus/campus-1.jpg';
 import campus2 from '@/assets/campus/campus-2.jpg';
 import campus3 from '@/assets/campus/campus-3.jpg';
@@ -121,7 +122,7 @@ export const HeroSection = () => {
 
   return (
     <section 
-      className="relative h-screen overflow-hidden"
+      className="relative h-screen min-h-[600px] overflow-hidden group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -152,9 +153,9 @@ export const HeroSection = () => {
         );
       })}
 
-      {/* Hero Content - All text animates together */}
+      {/* Hero Content */}
       <div className="relative z-10 h-full container mx-auto flex flex-col items-start justify-center px-4 md:px-8 lg:px-16">
-        <div className="text-left max-w-3xl">
+        <div className="text-left w-full max-w-3xl">
           <AnimatePresence mode="wait">
             <motion.div
               key={`content-${currentSlide}`}
@@ -162,34 +163,34 @@ export const HeroSection = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.6 }}
-              className="space-y-4"
+              className="space-y-3 md:space-y-4"
             >
-              {/* University Name - Animates with slide */}
+              {/* University Name */}
               <motion.h1
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.1 }}
-                className="font-formal text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-wide drop-shadow-lg"
+                className="font-formal text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-wide drop-shadow-lg"
               >
                 {currentSlideData?.title || 'Sunamganj Science and Technology University'}
               </motion.h1>
 
-              {/* Welcome Text - Animates with slide */}
+              {/* Welcome Text */}
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.3 }}
-                className="text-2xl md:text-3xl lg:text-4xl font-semibold text-white drop-shadow-md italic"
+                className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white drop-shadow-md italic"
               >
                 {currentSlideData?.welcome_text || 'Welcome to SSTU'}
               </motion.p>
 
-              {/* Tagline - Animates with slide */}
+              {/* Tagline */}
               <motion.p
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.5 }}
-                className="text-base md:text-lg lg:text-xl text-white/90 drop-shadow-sm"
+                className="text-sm sm:text-base md:text-lg lg:text-xl text-white/90 drop-shadow-sm"
               >
                 {currentSlideData?.subtitle || 'Admissions, academics, research, and campus life—everything in one place.'}
               </motion.p>
@@ -202,21 +203,21 @@ export const HeroSection = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
             onSubmit={handleSearch}
-            className="mt-10 flex flex-col sm:flex-row items-start gap-3 max-w-xl"
+            className="mt-6 md:mt-10 flex flex-col sm:flex-row items-stretch sm:items-start gap-3 max-w-xl"
           >
             <div className="relative flex-1 w-full">
               <Input
                 type="text"
-                placeholder="Search faculty/staff (name, title, email)"
+                placeholder="Search faculty/staff..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-14 pl-5 pr-4 text-base bg-white/95 border-0 rounded-full shadow-xl placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-primary"
+                className="h-12 md:h-14 pl-5 pr-4 text-sm md:text-base bg-white/95 border-0 rounded-full shadow-xl placeholder:text-muted-foreground/70 focus-visible:ring-2 focus-visible:ring-primary"
               />
             </div>
             <Button
               type="submit"
               size="lg"
-              className="h-14 px-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xl"
+              className="h-12 md:h-14 px-6 md:px-10 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold shadow-xl"
             >
               <Search className="w-5 h-5 mr-2" />
               Search
@@ -225,35 +226,21 @@ export const HeroSection = () => {
         </div>
       </div>
 
-      {/* Navigation Arrows */}
-      <AnimatePresence>
-        {isHovered && (
-          <>
-            <motion.button
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-              onClick={prevSlide}
-              className="absolute z-20 left-4 md:left-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all"
-              aria-label="Previous slide"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </motion.button>
-            <motion.button
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.3 }}
-              onClick={nextSlide}
-              className="absolute z-20 right-4 md:right-8 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all"
-              aria-label="Next slide"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </motion.button>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Navigation Arrows - always visible on mobile, hover on desktop */}
+      <button
+        onClick={prevSlide}
+        className="absolute z-20 left-3 md:left-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all lg:opacity-0 lg:group-hover:opacity-100"
+        aria-label="Previous slide"
+      >
+        <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
+      </button>
+      <button
+        onClick={nextSlide}
+        className="absolute z-20 right-3 md:right-8 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center text-white hover:bg-white hover:text-primary transition-all lg:opacity-0 lg:group-hover:opacity-100"
+        aria-label="Next slide"
+      >
+        <ChevronRight className="w-5 h-5 md:w-6 md:h-6" />
+      </button>
 
       {/* Slide Indicators */}
       <div className="absolute z-20 bottom-24 left-1/2 -translate-x-1/2 flex gap-3">

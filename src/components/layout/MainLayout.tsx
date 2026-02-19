@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Header } from './Header';
 import { Footer } from './Footer';
+import { MobileBottomNav } from './MobileBottomNav';
 import { BackToTopButton } from '@/components/ui/BackToTopButton';
 
 interface MainLayoutProps {
@@ -15,11 +16,12 @@ export function MainLayout({ children }: MainLayoutProps) {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className={`flex-1 ${isHomePage ? '' : 'pt-[104px] lg:pt-[136px]'}`}>
+      <main className={`flex-1 ${isHomePage ? '' : 'pt-[104px] lg:pt-[136px]'} pb-16 lg:pb-0`}>
         {children}
       </main>
       <Footer />
       <BackToTopButton />
+      <MobileBottomNav />
     </div>
   );
 }
